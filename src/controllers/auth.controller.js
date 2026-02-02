@@ -1,10 +1,10 @@
+import { loginService } from "../../src/services/auth.service.js";
+import { ApiResponse } from "../utils/ApiResponse.js";
+
 export const login = async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password } = await req.body;
 
-  const result = await authService.login(email, password);
+  const result = await loginService(email, password);
 
-  return res.json({
-    success: true,
-    data: result,
-  });
-};
+  res.json(new ApiResponse(200, "Login successful", result));
+}

@@ -2,11 +2,9 @@ import prisma from "../../prisma/client.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 
-export const loginUser = async (req, res) => {
 
-};
 export const getUserOrgs = async (req, res) => {
-  const userId = 1;
+  const userId = req.user.id;
 
   try {
     console.log("controller reached")

@@ -3,6 +3,7 @@ import cors from "cors"
 import cookieParser from "cookie-parser"
 import userRouter from "./routes/user.routes.js"
 import errorHandler from "../middleware/error.middleware.js"
+import authRouter from "./routes/auth.route.js"
 
 
 const app = express()
@@ -21,6 +22,7 @@ app.get("/", (req, res) => {
 
 
 app.use("/api/v1/user", userRouter)
+app.use("/api/v1/auth", authRouter)
 
 app.use(errorHandler)
 
