@@ -1,0 +1,109 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            Int       @id @default(autoincrement())
+  name          String
+  email         String    @unique
+  passwordHash String
+  image         String?
+  createdAt     DateTime  @default(now())
+
+  createdOrgs   Org[]
+  orgs          OrgUser[]
+  roles         OrgRole[]
+  auditLogs     AuditLogs[]
+}
+
+model Org {
+  id            Int       @id @default(autoincrement())
+  name          String
+  createdBy     Int
+  createdAt     DateTime  @default(now())
+
+  createdByUser User      @relation(fields: [createdBy], references: [id])
+
+  users         OrgUser[]
+  roles         OrgRole[]
+  auditLogs     AuditLogs[]
+}
+
+model OrgUser {
+  userId   Int
+  orgId    Int
+  joinedAt DateTime @default(now())
+
+  user     User @relation(fields: [userId], references: [id])
+  org      Org  @relation(fields: [orgId], references: [id])
+
+  @@id([userId, orgId])
+}
+
+
+enum Role {
+  ADMIN
+  VIEWER
+  EDITOR
+}
+model Roles {
+  id        Int     @id @default(autoincrement())
+  name      Role    @unique @default(VIEWER)
+
+  orgRoles       OrgRole[]
+  rolePermissions RolePermission[]
+}
+
+model Permissions {
+  id        Int     @id @default(autoincrement())
+  name      String  @unique
+
+  roles     RolePermission[]
+}
+
+model RolePermission {
+  roleId        Int
+  permissionId  Int
+
+  role          Roles @relation(fields: [roleId], references: [id])
+  permission   Permissions @relation(fields: [permissionId], references: [id])
+
+  @@id([roleId, permissionId])
+}
+
+model OrgRole {
+  roleId      Int
+  orgId       Int
+  userId      Int
+
+  role          Roles @relation(fields: [roleId], references: [id])
+  org           Org @relation(fields: [orgId], references: [id])
+  user          User @relation(fields: [userId], references: [id])
+
+  @@id([orgId, userId, roleId])
+}
+
+model AuditLogs {
+  id            Int @id @default(autoincrement())
+  orgId         Int
+  actorUserId   Int
+  action        String
+  resourceType  String
+  resourceId    Int
+  timestamp     DateTime @default(now())
+  metadata      Json?
+
+  org           Org @relation(fields: [orgId], references: [id])
+  actorUser     User @relation(fields: [actorUserId], references: [id])
+}
