@@ -5,10 +5,6 @@
 - 201 Created
 - 204 No Content
 
-## Redirection
-- 301 Moved Permanently
-- 302 Found
-- 304 Not Modified
 
 ## Client Error
 - 400 Bad Request
@@ -24,3 +20,8 @@
 - 502 Bad Gateway
 - 503 Service Unavailable
 - 504 Gateway Timeout
+
+# API Routes
+- api/v1/org/create = Create Org - POST
+- api/v1/auth/login = Login - POST
+- api/v1/user/orgs = Get users org - GET

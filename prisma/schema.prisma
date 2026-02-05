@@ -14,30 +14,37 @@ datasource db {
 }
 
 model User {
-  id            Int       @id @default(autoincrement())
-  name          String
-  email         String    @unique
+  id           Int      @id @default(autoincrement())
+  name         String
+  email        String   @unique
   passwordHash String
-  image         String?
-  createdAt     DateTime  @default(now())
+  image        String?
+  createdAt    DateTime @default(now())
 
-  createdOrgs   Org[]
-  orgs          OrgUser[]
-  roles         OrgRole[]
-  auditLogs     AuditLogs[]
+  createdOrgs         Org[]
+  orgs                OrgUser[]
+  createdDocs         Doc[]
+  roles               OrgRole[]
+  auditLogs           AuditLog[]
+  folders             Folder[]
+  docPermissions      DocPermission[]
+  folderPermissions   FolderPermission[]
+  uploadedDocVersions DocVersion[]
 }
 
 model Org {
-  id            Int       @id @default(autoincrement())
-  name          String
-  createdBy     Int
-  createdAt     DateTime  @default(now())
+  id        Int      @id @default(autoincrement())
+  name      String
+  createdBy Int
+  createdAt DateTime @default(now())
 
-  createdByUser User      @relation(fields: [createdBy], references: [id])
+  createdByUser User @relation(fields: [createdBy], references: [id])
 
-  users         OrgUser[]
-  roles         OrgRole[]
-  auditLogs     AuditLogs[]
+  users     OrgUser[]
+  roles     OrgRole[]
+  auditLogs AuditLog[]
+  folders   Folder[]
+  docs      Doc[]
 }
 
 model OrgUser {
@@ -45,65 +52,156 @@ model OrgUser {
   orgId    Int
   joinedAt DateTime @default(now())
 
-  user     User @relation(fields: [userId], references: [id])
-  org      Org  @relation(fields: [orgId], references: [id])
+  user User @relation(fields: [userId], references: [id])
+  org  Org  @relation(fields: [orgId], references: [id])
 
   @@id([userId, orgId])
 }
-
 
 enum Role {
   ADMIN
   VIEWER
   EDITOR
 }
-model Roles {
-  id        Int     @id @default(autoincrement())
-  name      Role    @unique @default(VIEWER)
 
-  orgRoles       OrgRole[]
+model Roles {
+  id   Int  @id @default(autoincrement())
+  name Role @unique @default(VIEWER)
+
+  orgRoles        OrgRole[]
   rolePermissions RolePermission[]
 }
 
 model Permissions {
-  id        Int     @id @default(autoincrement())
-  name      String  @unique
+  id   Int    @id @default(autoincrement())
+  name String @unique
 
-  roles     RolePermission[]
+  roles             RolePermission[]
+  docPermissions    DocPermission[]
+  folderPermissions FolderPermission[]
 }
 
 model RolePermission {
-  roleId        Int
-  permissionId  Int
+  roleId       Int
+  permissionId Int
 
-  role          Roles @relation(fields: [roleId], references: [id])
-  permission   Permissions @relation(fields: [permissionId], references: [id])
+  role       Roles       @relation(fields: [roleId], references: [id])
+  permission Permissions @relation(fields: [permissionId], references: [id])
 
   @@id([roleId, permissionId])
 }
 
 model OrgRole {
-  roleId      Int
-  orgId       Int
-  userId      Int
+  roleId Int
+  orgId  Int
+  userId Int
 
-  role          Roles @relation(fields: [roleId], references: [id])
-  org           Org @relation(fields: [orgId], references: [id])
-  user          User @relation(fields: [userId], references: [id])
+  role Roles @relation(fields: [roleId], references: [id])
+  org  Org   @relation(fields: [orgId], references: [id])
+  user User  @relation(fields: [userId], references: [id])
 
   @@id([orgId, userId, roleId])
 }
 
-model AuditLogs {
-  id            Int @id @default(autoincrement())
-  orgId         Int
-  actorUserId   Int
-  action        String
-  resourceType  String
-  resourceId    Int
-  timestamp     DateTime @default(now())
-  metadata      Json?
+model AuditLog {
+  id           Int      @id @default(autoincrement())
+  orgId        Int
+  actorUserId  Int
+  action       String
+  resourceType String
+  resourceId   Int
+  timestamp    DateTime @default(now())
+  metadata     Json?
 
-  org           Org @relation(fields: [orgId], references: [id])
-  actorUser     User @relation(fields: [actorUserId], references: [id])
+  org       Org  @relation(fields: [orgId], references: [id])
+  actorUser User @relation(fields: [actorUserId], references: [id])
+}
+
+model Folder {
+  id             Int       @id @default(autoincrement())
+  orgId          Int
+  createdBy      Int
+  name           String
+  parentFolderId Int?
+  createdAt      DateTime  @default(now())
+  deletedAt      DateTime?
+
+  createdByUser User     @relation(fields: [createdBy], references: [id])
+  org           Org      @relation(fields: [orgId], references: [id])
+  parentFolder  Folder?  @relation("FolderHierarchy", fields: [parentFolderId], references: [id])
+  subFolders    Folder[] @relation("FolderHierarchy")
+
+  docs              Doc[]
+  folderPermissions FolderPermission[]
+
+  @@unique([orgId, parentFolderId, name])
+}
+
+model Doc {
+  id               Int       @id @default(autoincrement())
+  folderId         Int
+  orgId            Int
+  currentVersionId Int?      @unique
+  createdBy        Int
+  name             String
+  createdAt        DateTime  @default(now())
+  deletedAt        DateTime?
+
+  org           Org    @relation(fields: [orgId], references: [id])
+  folder        Folder @relation(fields: [folderId], references: [id])
+  createdByUser User   @relation(fields: [createdBy], references: [id])
+
+  versions DocVersion[] @relation("DocVersions")
+
+  currentVersion DocVersion? @relation("CurrentDocVersion", fields: [currentVersionId], references: [id])
+
+  docPermissions DocPermission[]
+}
+
+model DocVersion {
+  id            Int      @id @default(autoincrement())
+  docId         Int
+  fileUrl       String
+  fileHash      String
+  versionNumber Int
+  uploadedBy    Int
+  createdAt     DateTime @default(now())
+
+  doc Doc @relation("DocVersions", fields: [docId], references: [id])
+  currentOf Doc? @relation("CurrentDocVersion")
+
+  versionUploader User @relation(fields: [uploadedBy], references: [id])
+
+  @@unique([docId, versionNumber])
+}
+
+enum PermissionEffect {
+  ALLOW
+  DENY
+}
+
+model FolderPermission {
+  folderId     Int
+  userId       Int
+  permissionId Int
+  effect       PermissionEffect
+
+  folder     Folder      @relation(fields: [folderId], references: [id])
+  user       User        @relation(fields: [userId], references: [id])
+  permission Permissions @relation(fields: [permissionId], references: [id])
+
+  @@id([folderId, userId, permissionId])
+}
+
+model DocPermission {
+  docId        Int
+  userId       Int
+  permissionId Int
+  effect       PermissionEffect
+
+  doc        Doc         @relation(fields: [docId], references: [id])
+  user       User        @relation(fields: [userId], references: [id])
+  permission Permissions @relation(fields: [permissionId], references: [id])
+
+  @@id([docId, userId, permissionId])
 }

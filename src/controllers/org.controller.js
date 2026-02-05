@@ -1,62 +1,11 @@
-import prisma from "../../prisma/client";
-import { ApiError } from "../utils/ApiError";
-import { ApiResponse } from "../utils/ApiResponse";
+import { createOrgService } from "../services/org.service.js";
+import { ApiResponse } from "../utils/ApiResponse.js";
 
 
 export const createOrg = async (req, res) => {
   const { orgName, createdByID } = await req.body;
 
-  if (!orgName || !createdByID) return res.json({ message: "Org name & creator is required" }, 400);
-  try {
-    const results = await prisma.$transaction(async (tx) => {
-      // Create Org
-      const org = await tx.org.create({
-        data: {
-          name: orgName,
-          createdBy: createdByID
-        }
-      })
-      console.log("org created:", org)
-      // Add creator to org
-      const orgUser = await tx.orgUser.create({
-        data: {
-          userId: createdByID,
-          orgId: org.id
-        }
-      })
-      console.log("org user created:", orgUser)
-      // Assign Admin role
-      const roles = await tx.roles.findMany();
-      const roleMap = Object.fromEntries(
-        roles.map((role) => [role.name, role.id])
-      );
-      const assignRole = await tx.orgRole.create({
-        data: {
-          roleId: roleMap.ADMIN,
-          orgId: org.id,
-          userId: createdByID
-        }
-      })
-      console.log("role assigned:", assignRole)
-      // Audit log
-      const audit = await tx.auditLogs.create({
-        data: {
-          orgId: org.id,
-          action: "org.create",
-          actorUserId: createdByID,
-          resourceType: "org",
-          resourceId: org.id,
-          metadata: {
-            name: org.name
-          }
-        }
-      })
-      console.log("audit log created:", audit)
+  const result = await createOrgService(orgName, createdByID);
 
-      return { org, orgUser, assignRole, audit }
-    })
-    res.json(new ApiResponse(200, "Org created successfully", results));
-  } catch (error) {
-    throw new ApiError(500, "Failed to create org", error);
-  }
+  return res.json(new ApiResponse(200, "Org created", result));
 };

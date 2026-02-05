@@ -1,5 +1,5 @@
-import { ApiError } from "../src/utils/ApiError.js";
-import { verifyToken } from "../src/utils/jwt.js";
+import { ApiError } from "../utils/ApiError.js";
+import { verifyToken } from "../utils/jwt.js";
 
 export const authMiddleware = (req, res, next) => {
   console.log("middleware reached")
@@ -14,6 +14,10 @@ export const authMiddleware = (req, res, next) => {
     req.user = { id: user.id };
     next();
   } catch (error) {
+    if (error instanceof ApiError) {
+      throw error;
+
+    }
     throw new ApiError(401, "Invalid token");
   }
 };

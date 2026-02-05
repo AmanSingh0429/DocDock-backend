@@ -1,7 +1,7 @@
-import e from "express";
+import Router from "express";
 import { getUserOrgs } from "../controllers/user.controller.js";
-import { authMiddleware } from "../../middleware/auth.middleware.js";
-const router = e.Router();
+import { authMiddleware } from "../middleware/auth.middleware.js";
+const router = Router();
 
 router.get("/", (req, res) => {
   res.json({ message: "User route" });
