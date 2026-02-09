@@ -1,5 +1,5 @@
-import { ApiError } from "../utils/ApiError.js";
-import prisma from "../../prisma/client.js";
+import prisma from "../../../prisma/client.js";
+import { ApiError } from "../../utils/ApiError.js";
 
 export const createOrgService = async (orgName, createdByID) => {
 
@@ -41,9 +41,9 @@ export const createOrgService = async (orgName, createdByID) => {
       const audit = await tx.auditLogs.create({
         data: {
           orgId: org.id,
-          action: "org.create",
           actorUserId: createdByID,
-          resourceType: "org",
+          action: "CREATE",
+          resourceType: "ORG",
           resourceId: org.id,
           metadata: {
             name: org.name

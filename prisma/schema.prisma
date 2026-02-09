@@ -139,23 +139,25 @@ model Folder {
 
 model Doc {
   id               Int       @id @default(autoincrement())
-  folderId         Int
   orgId            Int
+  folderId         Int?
   currentVersionId Int?      @unique
   createdBy        Int
   name             String
   createdAt        DateTime  @default(now())
   deletedAt        DateTime?
 
-  org           Org    @relation(fields: [orgId], references: [id])
-  folder        Folder @relation(fields: [folderId], references: [id])
-  createdByUser User   @relation(fields: [createdBy], references: [id])
+  org           Org     @relation(fields: [orgId], references: [id])
+  folder        Folder? @relation(fields: [folderId], references: [id])
+  createdByUser User    @relation(fields: [createdBy], references: [id])
 
-  versions DocVersion[] @relation("DocVersions")
-
-  currentVersion DocVersion? @relation("CurrentDocVersion", fields: [currentVersionId], references: [id])
+  versions       DocVersion[] @relation("DocVersions")
+  currentVersion DocVersion?  @relation("CurrentDocVersion", fields: [currentVersionId], references: [id])
 
   docPermissions DocPermission[]
+
+  @@unique([orgId, folderId, name])
+  @@unique([orgId, name], map: "unique_root_doc_name")
 }
 
 model DocVersion {
@@ -163,11 +165,13 @@ model DocVersion {
   docId         Int
   fileUrl       String
   fileHash      String
+  publicId      String
+  bytes         Int
   versionNumber Int
   uploadedBy    Int
   createdAt     DateTime @default(now())
 
-  doc Doc @relation("DocVersions", fields: [docId], references: [id])
+  doc       Doc  @relation("DocVersions", fields: [docId], references: [id])
   currentOf Doc? @relation("CurrentDocVersion")
 
   versionUploader User @relation(fields: [uploadedBy], references: [id])

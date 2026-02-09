@@ -6,7 +6,7 @@ export const authMiddleware = (req, res, next) => {
   const token = req.headers.authorization?.split(" ")[1];
 
   if (!token) {
-    throw new ApiError(401, "Unauthorized");
+    throw new ApiError(401, "Unauthorized Acess");
   }
 
   try {

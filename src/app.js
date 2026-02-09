@@ -5,7 +5,7 @@ import errorHandler from "./middleware/error.middleware.js"
 
 import userRouter from "./routes/user.routes.js"
 import authRouter from "./routes/auth.route.js"
-import orgRouter from "./routes/org.route.js"
+import orgRouter from "./routes/org/org.route.js"
 
 
 const app = express()
@@ -25,7 +25,7 @@ app.get("/", (req, res) => {
 
 app.use("/api/v1/user", userRouter)
 app.use("/api/v1/auth", authRouter)
-app.use("/api/v1/org", orgRouter)
+app.use("/api/v1/orgs", orgRouter)
 
 app.use(errorHandler)
 

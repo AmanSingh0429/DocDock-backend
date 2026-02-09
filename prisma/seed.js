@@ -15,7 +15,9 @@ const main = async () => {
       // Document
       { name: "document.create" },
       { name: "document.read" },
-      { name: "document.edit" },
+      { name: "document.update" },
+      { name: "document.rename" },
+      { name: "document.move" },
       { name: "document.delete" },
       { name: "document.restore" },
 
@@ -83,7 +85,9 @@ const main = async () => {
     [
       "document.create",
       "document.read",
-      "document.edit",
+      "document.update",
+      "document.rename",
+      "document.move",
       "document.restore",
       "folder.create",
       "folder.read",

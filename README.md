@@ -22,6 +22,14 @@
 - 504 Gateway Timeout
 
 # API Routes
-- api/v1/org/create = Create Org - POST
+- Create docs
+- api/v1/orgs/:orgId/docs/ - create single doc in the root of the org - POST
+- api/v1/orgs/:orgId/docs/:docId/versions - update existing doc version - POST
+
+
+- api/v1/orgs/:orgId/folder/:folderId/docs/ - create single doc inside a folder in the org - POST
+
+
+- api/v1/orgs/create = Create Org - POST
 - api/v1/auth/login = Login - POST
 - api/v1/user/orgs = Get users org - GET
