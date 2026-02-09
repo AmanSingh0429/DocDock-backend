@@ -194,3 +194,65 @@ export const updateDocumentService = async (orgId, userId, docId, file) => {
     throw new ApiError(500, "Failed to update document, server error", error, false)
   }
 }
+
+export const renameDocumentService = async (orgId, userId, docId, name) => {
+  if (!name) {
+    throw new ApiError(400, "Document name is required");
+  }
+  try {
+    const existingDoc = await prisma.doc.findFirst({
+      where: {
+        id: docId,
+        orgId
+      }
+    })
+    if (!existingDoc || existingDoc.deletedAt) {
+      throw new ApiError(404, "Document not found");
+    }
+    if (existingDoc.name === name) {
+      throw new ApiError(400, "New name must be different from current name");
+    }
+    const transactionResult = await prisma.$transaction(async (tx) => {
+      const updateDocName = await tx.doc.update({
+        where: {
+          id: docId
+        },
+        data: {
+          name
+        }
+      })
+      const auditLog = await tx.auditLog.create({
+        data: {
+          orgId,
+          actorUserId: userId,
+          action: "RENAME_DOCUMENT",
+          resourceType: "DOCUMENT",
+          resourceId: docId,
+          metadata: {
+            oldName: existingDoc.name,
+            newName: name
+          }
+        }
+      })
+      const finalResult = await tx.doc.findUnique({
+        where: {
+          id: docId
+        },
+        include: {
+          currentVersion: true
+        }
+      })
+      return { finalResult }
+    })
+    return transactionResult
+  } catch (error) {
+    if (error instanceof ApiError) {
+      throw error
+    }
+    // Error if document with same name already exists in same scope
+    if (error.code === "P2002") {
+      throw new ApiError(409, "Document with same name already exists");
+    }
+    throw new ApiError(500, "Failed to rename document, server error", error, false)
+  }
+}

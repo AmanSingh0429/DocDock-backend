@@ -24,6 +24,7 @@
 # API Routes
 - Create docs
 - api/v1/orgs/:orgId/docs/ - create single doc in the root of the org - POST
+- Update docs
 - api/v1/orgs/:orgId/docs/:docId/versions - update existing doc version - POST
 
 
