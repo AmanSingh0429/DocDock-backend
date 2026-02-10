@@ -1,6 +1,22 @@
-import { createDocumentService, renameDocumentService, updateDocumentService } from "../../services/org/document.service.js";
+import { createDocumentService, deleteDocumentService, getDocumentsService, getDocumentVersionsService, getSingleDocumentService, moveDocumentService, renameDocumentService, updateDocumentService } from "../../services/org/document.service.js";
 import { ApiResponse } from "../../utils/ApiResponse.js";
 
+export const getDocuments = async (req, res) => {
+  console.log("controller reached")
+  const { orgId } = await req.params;
+
+  const result = await getDocumentsService(Number(orgId), null)
+
+  return res.json(new ApiResponse(200, "Documents fetched successfully", result))
+}
+export const getSingleDocument = async (req, res) => {
+  console.log("controller reached")
+  const { orgId, docId } = await req.params;
+
+  const result = await getSingleDocumentService(Number(orgId), Number(docId));
+
+  return res.json(new ApiResponse(200, "Document fetched successfully", result));
+}
 export const createDocument = async (req, res) => {
   console.log("controller reached")
   const { orgId } = await req.params;
@@ -22,15 +38,42 @@ export const updateDocument = async (req, res) => {
 
   return res.json(new ApiResponse(200, "Document created", result));
 }
+export const getDocumentVersions = async (req, res) => {
+  console.log("controller reached")
+  const { orgId, docId } = await req.params
 
+  const result = await getDocumentVersionsService(orgId, docId);
+
+  return res.json(new ApiResponse(200, "Fetched documnet versions", result))
+}
 export const renameDocument = async (req, res) => {
   console.log("controller reached")
   const { orgId, docId } = await req.params;
   const userId = req.user.id;
   const { newDocName } = await req.body;
-  console.log({ newDocName })
 
   const result = await renameDocumentService(Number(orgId), userId, Number(docId), newDocName);
 
   return res.json(new ApiResponse(200, "Document created", result));
+}
+
+export const moveDocument = async (req, res) => {
+  console.log("controller reached")
+  const { orgId, docId } = await req.params;
+  const userId = req.user.id;
+  const { destinationFolderId } = await req.body;
+
+  const result = await moveDocumentService(Number(orgId), userId, Number(docId), destinationFolderId);
+
+  res.json(new ApiResponse(200, "Document created", result));
+}
+
+export const deleteDocument = async (req, res) => {
+  console.log("controller reached")
+  const { orgId, docId } = await req.params;
+  const userId = await req.user.id
+
+  const result = await deleteDocumentService(Number(orgId), Number(docId), userId)
+
+  res.json(new ApiResponse(200, "Document deleted", result))
 }

@@ -22,10 +22,29 @@
 - 504 Gateway Timeout
 
 # API Routes
-- Create docs
+- Get docs
+- api/v1/orgs/:orgId/docs/ - Get root(org) docs -GET
+
+- Get single doc
+- api/v1/orgs/:orgId/docs/:docId - Get root(org) docs -GET
+
+- Create doc
 - api/v1/orgs/:orgId/docs/ - create single doc in the root of the org - POST
+
 - Update docs
-- api/v1/orgs/:orgId/docs/:docId/versions - update existing doc version - POST
+- api/v1/orgs/:orgId/docs/:docId/versions - update existing doc's version - POST
+
+- Get doc Version
+- api/v1/orgs/:orgId/docs/:docId/versions - get existing doc's version - GET
+
+- Rename doc
+- api/v1/orgs/:orgId/docs/:docId/ - Rename existing doc - PATCH
+
+- Move doc
+- api/v1/orgs/:orgId/docs/:docId/move - move existing doc to a folder org root org - PATCH
+
+- Delete doc
+- api/v1/orgs/:orgId/docs/:docId - delete document - DELETE
 
 
 - api/v1/orgs/:orgId/folder/:folderId/docs/ - create single doc inside a folder in the org - POST

@@ -2,6 +2,47 @@ import prisma from "../../../prisma/client.js";
 import { ApiError } from "../../utils/ApiError.js";
 import { deleteFromCloudinary, uploadToCloudinary } from "../../utils/cloudinary.js";
 import { createHash } from "crypto"
+
+export const getDocumentsService = async (orgId, folderId) => {
+  console.log("getAllDocumentsService reached")
+  try {
+    const allDocuments = await prisma.doc.findMany({
+      where: {
+        orgId,
+        folderId,
+        deletedAt: null
+      }
+    })
+    return allDocuments;
+  } catch (error) {
+    console.log(error)
+    throw new ApiError(500, "Failed to fetch documents", error, false)
+  }
+}
+export const getSingleDocumentService = async (orgId, docId) => {
+  console.log("getSingleDocumentservice reached")
+  try {
+    const doc = await prisma.doc.findFirst({
+      where: {
+        id: docId,
+        orgId,
+        deletedAt: null
+      },
+      include: {
+        currentVersion: true
+      }
+    })
+    if (!doc) {
+      throw new ApiError(404, "The requested document not found");
+    }
+    return doc
+  } catch (error) {
+    if (error instanceof ApiError) {
+      throw error;
+    }
+    throw new ApiError(500, "Failed to fetch document", error, false)
+  }
+}
 export const createDocumentService = async (orgId, userId, docName, file, folderId) => {
   console.log("createDocumentService reached")
 
@@ -97,7 +138,6 @@ export const createDocumentService = async (orgId, userId, docName, file, folder
   }
 
 }
-
 export const updateDocumentService = async (orgId, userId, docId, file) => {
   console.log("updateDocumentService reached")
   if (!docId || !file) {
@@ -195,6 +235,32 @@ export const updateDocumentService = async (orgId, userId, docId, file) => {
   }
 }
 
+export const getDocumentVersionsService = async (orgId, docId) => {
+  try {
+    const doc = await prisma.doc.findFirst({
+      where: {
+        id: docId,
+        orgId,
+        deletedAt: null
+      },
+      include: {
+        versions: {
+          orderBy: { versionNumber: "desc" }
+        }
+      }
+    })
+    if (!doc) {
+      throw new ApiError(404, "Document not found")
+    }
+    return doc
+  } catch (error) {
+    if (error instanceof ApiError) {
+      throw error
+    }
+    throw new ApiError(500, "Failed to fetch document versions", error, false)
+  }
+}
+
 export const renameDocumentService = async (orgId, userId, docId, name) => {
   if (!name) {
     throw new ApiError(400, "Document name is required");
@@ -255,4 +321,120 @@ export const renameDocumentService = async (orgId, userId, docId, name) => {
     }
     throw new ApiError(500, "Failed to rename document, server error", error, false)
   }
+}
+
+export const moveDocumentService = async (orgId, userId, docId, folderId) => {
+  try {
+    const existingDoc = await prisma.doc.findFirst({
+      where: {
+        id: docId,
+        orgId
+      }
+    })
+    if (!existingDoc || existingDoc.deletedAt) {
+      throw new ApiError(404, "Document not found");
+    }
+    if (existingDoc.folderId === folderId) {
+      throw new ApiError(400, "Document is already in this location");
+    }
+    if (folderId !== null) {
+      const folderexists = await prisma.folder.findFirst({
+        where: {
+          id: folderId,
+          orgId,
+          deletedAt: null
+        }
+      })
+      if (!folderexists) {
+        throw new ApiError(404, "Destination folder not found");
+      }
+    }
+    const transactionResult = await prisma.$transaction(async (tx) => {
+
+      const updateDocFolder = await tx.doc.update({
+        where: {
+          id: docId
+        },
+        data: {
+          folderId
+        }
+      })
+      const auditLog = await tx.auditLog.create({
+        data: {
+          orgId,
+          actorUserId: userId,
+          action: "MOVE_DOCUMENT",
+          resourceType: "DOCUMENT",
+          resourceId: docId,
+          metadata: {
+            fromFolderId: existingDoc.folderId,
+            toFolderId: folderId
+          }
+        }
+      })
+      const finalResult = await tx.doc.findUnique({
+        where: {
+          id: docId
+        },
+        include: {
+          currentVersion: true
+        }
+      })
+      return { finalResult }
+    })
+    return transactionResult
+  } catch (error) {
+    if (error instanceof ApiError) {
+      throw error
+    }
+    // Error if document with same name already exists in same scope
+    if (error.code === "P2002") {
+      throw new ApiError(409, "Document with same name already exists in the destination folder");
+    }
+    throw new ApiError(500, "Failed to move document, server error", error, false)
+  }
+}
+
+export const deleteDocumentService = async (orgId, docId, userId) => {
+  try {
+    const existingDoc = await prisma.doc.findFirst({
+      where: {
+        id: docId,
+        orgId,
+        deletedAt: null
+      }
+    })
+    if (!existingDoc) {
+      throw new ApiError(404, "Document not found or already deleted");
+    }
+    const result = await prisma.$transaction(async (tx) => {
+      const deletedDoc = await tx.doc.update({
+        where: { id: docId },
+        data: { deletedAt: new Date() }
+      });
+
+      await tx.auditLog.create({
+        data: {
+          orgId,
+          actorUserId: userId,
+          action: "DELETE_DOCUMENT",
+          resourceType: "DOCUMENT",
+          resourceId: docId,
+          metadata: {
+            deletedAt: new Date()
+          }
+        }
+      });
+
+      return deletedDoc;
+    });
+
+    return result
+  } catch (error) {
+    if (error instanceof ApiError) {
+      throw error
+    }
+    throw new ApiError(500, "Failed to delete document", error, false)
+  }
+
 }
