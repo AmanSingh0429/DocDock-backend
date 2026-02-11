@@ -9,7 +9,7 @@ export const getDocumentsService = async (orgId, folderId) => {
     const allDocuments = await prisma.doc.findMany({
       where: {
         orgId,
-        folderId,
+        folderId: folderId ?? null,
         deletedAt: null
       }
     })
@@ -61,7 +61,7 @@ export const createDocumentService = async (orgId, userId, docName, file, folder
       const createDoc = await tx.doc.create({
         data: {
           orgId,
-          folderId,
+          folderId: folderId ?? null,
           createdBy: userId,
           name: docName,
         }
@@ -189,8 +189,8 @@ export const updateDocumentService = async (orgId, userId, docId, file) => {
           resourceType: "DOC",
           resourceId: docId,
           metadata: {
-            newVersion: nextVersionNumber,
             docName: existingDoc.name,
+            newVersion: nextVersionNumber,
             docType: file.mimetype,
             fileSize: file.size,
             originalName: file.originalname
@@ -213,7 +213,7 @@ export const updateDocumentService = async (orgId, userId, docId, file) => {
           currentVersion: true
         }
       })
-      return { finalResult }
+      return finalResult
     })
 
     return transactionResult;
@@ -356,7 +356,7 @@ export const moveDocumentService = async (orgId, userId, docId, folderId) => {
           id: docId
         },
         data: {
-          folderId
+          folderId: folderId ?? null
         }
       })
       const auditLog = await tx.auditLog.create({
@@ -367,8 +367,9 @@ export const moveDocumentService = async (orgId, userId, docId, folderId) => {
           resourceType: "DOCUMENT",
           resourceId: docId,
           metadata: {
+            docName: existingDoc.name,
             fromFolderId: existingDoc.folderId,
-            toFolderId: folderId
+            toFolderId: folderId ?? null
           }
         }
       })
@@ -421,7 +422,8 @@ export const deleteDocumentService = async (orgId, docId, userId) => {
           resourceType: "DOCUMENT",
           resourceId: docId,
           metadata: {
-            deletedAt: new Date()
+            docName: existingDoc.name,
+            deletedFromFolder: existingDoc.folderId,
           }
         }
       });
@@ -437,4 +439,71 @@ export const deleteDocumentService = async (orgId, docId, userId) => {
     throw new ApiError(500, "Failed to delete document", error, false)
   }
 
+}
+
+export const restoreDocumentService = async (orgId, docId, userId, folderId) => {
+  try {
+    const existingDoc = await prisma.doc.findFirst({
+      where: {
+        id: docId,
+        orgId,
+      }
+    })
+    if (!existingDoc) {
+      throw new ApiError(404, "Document not found")
+    }
+    if (existingDoc.deletedAt == null) {
+      throw new ApiError(400, "Document is not deleted");
+    }
+    let restoreFolderId = existingDoc.folderId;
+
+    if (restoreFolderId !== null) {
+      const folder = await prisma.folder.findFirst({
+        where: {
+          id: restoreFolderId,
+          orgId,
+          deletedAt: null
+        }
+      });
+
+      if (!folder) {
+        restoreFolderId = null;
+      }
+    }
+    const transactionResult = await prisma.$transaction(async (tx) => {
+      const restore = await tx.doc.update({
+        where: {
+          id: docId,
+        },
+        data: {
+          deletedAt: null,
+          folderId: restoreFolderId
+        }
+      })
+      await tx.auditLog.create({
+        data: {
+          orgId,
+          actorUserId: userId,
+          action: "RESTORE_DOCUMENT",
+          resourceType: "DOCUMENT",
+          resourceId: docId,
+          metadata: {
+            docName: existingDoc.name,
+            previousLocation: existingDoc.folderId,
+            newLocation: restoreFolderId
+          }
+        }
+      })
+      return restore
+    })
+    return transactionResult
+  } catch (error) {
+    if (error instanceof ApiError) {
+      throw error
+    }
+    if (error.code === "P2002") {
+      throw new ApiError(409, "Document with same name exists at the restore location")
+    }
+    throw new ApiError(500, "Failed to restore document", error, false)
+  }
 }

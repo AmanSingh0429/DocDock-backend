@@ -24,12 +24,13 @@ const main = async () => {
       // Folder
       { name: "folder.create" },
       { name: "folder.read" },
-      { name: "folder.edit" },
+      { name: "folder.rename" },
+      { name: "folder.move" },
       { name: "folder.delete" },
 
-      // Org (management, not creation)
+      // Org 
       { name: "org.read" },
-      { name: "org.edit" },
+      { name: "org.rename" },
       { name: "org.delete" },
 
       // Org users
@@ -91,7 +92,8 @@ const main = async () => {
       "document.restore",
       "folder.create",
       "folder.read",
-      "folder.edit",
+      "folder.rename",
+      "folder.move",
       "org.read",
     ].includes(p.name)).map((perm) => perm.id);
   await prisma.rolePermission.createMany({

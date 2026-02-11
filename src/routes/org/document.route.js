@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { authMiddleware } from "../../middleware/auth.middleware.js";
-import { createDocument, deleteDocument, getDocuments, getDocumentVersions, getSingleDocument, moveDocument, renameDocument, updateDocument } from "../../controllers/org/document.controller.js";
+import { createDocument, deleteDocument, getDocuments, getDocumentVersions, getSingleDocument, moveDocument, renameDocument, restoreDocument, updateDocument } from "../../controllers/org/document.controller.js";
 import { uploadSingle } from "../../middleware/multer.middleware.js";
 import { requirePermission } from "../../middleware/permission.middleware.js";
 
@@ -20,5 +20,8 @@ router.patch("/:docId", authMiddleware, requirePermission("document.rename"), re
 // Move Document
 router.patch("/:docId/move", authMiddleware, requirePermission("document.move"), moveDocument)
 // Delete Document
-router.delete("/:docId", authMiddleware, requirePermission("document.delete", deleteDocument))
+router.delete("/:docId", authMiddleware, requirePermission("document.delete"), deleteDocument)
+// Restore Document
+router.post("/:docId/restore", authMiddleware, requirePermission("document.restore"), restoreDocument)
+
 export default router;

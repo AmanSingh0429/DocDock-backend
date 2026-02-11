@@ -1,4 +1,4 @@
-import { createDocumentService, deleteDocumentService, getDocumentsService, getDocumentVersionsService, getSingleDocumentService, moveDocumentService, renameDocumentService, updateDocumentService } from "../../services/org/document.service.js";
+import { createDocumentService, deleteDocumentService, getDocumentsService, getDocumentVersionsService, getSingleDocumentService, moveDocumentService, renameDocumentService, restoreDocumentService, updateDocumentService } from "../../services/org/document.service.js";
 import { ApiResponse } from "../../utils/ApiResponse.js";
 
 export const getDocuments = async (req, res) => {
@@ -76,4 +76,14 @@ export const deleteDocument = async (req, res) => {
   const result = await deleteDocumentService(Number(orgId), Number(docId), userId)
 
   res.json(new ApiResponse(200, "Document deleted", result))
+}
+
+export const restoreDocument = async (req, res) => {
+  console.log("controller reached")
+  const { orgId, docId } = await req.params;
+  const userId = await req.user.id
+
+  const result = await restoreDocumentService(Number(orgId), Number(docId), userId)
+
+  res.json(new ApiResponse(200, "Document restored", result))
 }
