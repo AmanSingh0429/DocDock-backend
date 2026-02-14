@@ -27,6 +27,7 @@ const main = async () => {
       { name: "folder.rename" },
       { name: "folder.move" },
       { name: "folder.delete" },
+      { name: "folder.restore" },
 
       // Org 
       { name: "org.read" },

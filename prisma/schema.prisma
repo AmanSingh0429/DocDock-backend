@@ -157,7 +157,6 @@ model Doc {
   docPermissions DocPermission[]
 
   @@unique([orgId, folderId, name])
-  @@unique([orgId, name], map: "unique_root_doc_name")
 }
 
 model DocVersion {
