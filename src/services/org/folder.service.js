@@ -1,6 +1,40 @@
 import prisma from "../../../prisma/client.js";
 import { ApiError } from "../../utils/ApiError.js";
 
+export const getFolderContentsService = async (orgId, folderId) => {
+  try {
+    const existigFolder = await prisma.folder.findFirst({
+      where: {
+        id: folderId,
+        orgId,
+        deletedAt: null
+      }
+    })
+    if (!existigFolder) {
+      throw new ApiError(404, "Folder not found");
+    }
+    const folders = await prisma.folder.findMany({
+      where: {
+        orgId,
+        parentFolderId: folderId,
+        deletedAt: null
+      }
+    })
+    const docs = await prisma.doc.findMany({
+      where: {
+        orgId,
+        folderId: folderId,
+        deletedAt: null
+      }
+    })
+    return { folders, docs }
+  } catch (error) {
+    if (error instanceof ApiError) {
+      throw error
+    }
+    throw new ApiError(500, "Failed to fetch folder contents", error, false)
+  }
+};
 export const createFolderService = async (orgId, userId, parentFolderId, folderName) => {
   const cleanFolderName = folderName.trim();
   if (!folderName || !cleanFolderName) {

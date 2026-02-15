@@ -1,9 +1,11 @@
 import { Router } from "express";
-import { createDocInFolder, createFolder, deleteFolder, moveFolder, renameFolder, restoreFolder } from "../../controllers/org/folder.controller.js";
+import { createDocInFolder, createFolder, deleteFolder, getFolderContents, moveFolder, renameFolder, restoreFolder } from "../../controllers/org/folder.controller.js";
 import { authMiddleware } from "../../middleware/auth.middleware.js";
 import { requirePermission } from "../../middleware/permission.middleware.js";
 
 const router = Router({ mergeParams: true });
+// Get Folders Contents
+router.get("/:folderId", authMiddleware, requirePermission("folder.read"), getFolderContents);
 // Create Folder
 router.post("/", authMiddleware, requirePermission("folder.create"), createFolder)
 // Rename Folder

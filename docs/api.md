@@ -12,6 +12,7 @@ DocDock follows standard RESTful response semantics.
 
 - **200 OK** – Successful request
 - **201 Created** – Resource successfully created
+- **204 No Content** – Successful operation with no response body
 
 ---
 
@@ -117,9 +118,9 @@ Restores a previously deleted document.
 
 ## 🔹 Get Root Folders
 
-`GET /api/v1/orgs/:orgId/folders`
+`GET /api/v1/orgs/:orgId/folders/:folderId`
 
-Returns folders located at the organization root.
+Returns contents of the folder
 
 ---
 

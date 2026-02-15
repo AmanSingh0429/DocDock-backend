@@ -181,17 +181,3 @@ It demonstrates:
 ---
 
 **DocDock** represents a serious backend architecture project focused on production-ready SaaS design principles and enterprise-grade document management.
-
-- Create folder
-- api/v1/orgs/:orgId/folder/ - create folder in org - POST
-- Rename folder
-- api/v1/orgs/:orgId/folder/:folderId - create folder in org - PATCH
-
-
-
-- api/v1/orgs/:orgId/folder/:folderId/docs/ - create single doc inside a folder in the org - POST
-
-
-- api/v1/orgs/create = Create Org - POST
-- api/v1/auth/login = Login - POST
-- api/v1/user/orgs = Get users org - GET

@@ -1,7 +1,15 @@
 import prisma from "../../../prisma/client.js";
 import { createDocumentService } from "../../services/org/document.service.js";
-import { createFolderService, deleteFolderService, moveFolderService, renameFolderService, restoreFolderService } from "../../services/org/folder.service.js";
+import { createFolderService, deleteFolderService, getFolderContentsService, moveFolderService, renameFolderService, restoreFolderService } from "../../services/org/folder.service.js";
 import { ApiResponse } from "../../utils/ApiResponse.js";
+
+export const getFolderContents = async (req, res) => {
+  const { orgId, folderId } = await req.params;
+
+  const result = await getFolderContentsService(Number(orgId), Number(folderId))
+
+  return res.json(new ApiResponse(200, "Folders fetched successfully", result))
+};
 
 export const createFolder = async (req, res) => {
   const userId = await req.user.id
