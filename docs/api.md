@@ -116,7 +116,7 @@ Restores a previously deleted document.
 
 ---
 
-## 🔹 Get Root Folders
+## 🔹 Get Folder Contents
 
 `GET /api/v1/orgs/:orgId/folders/:folderId`
 
