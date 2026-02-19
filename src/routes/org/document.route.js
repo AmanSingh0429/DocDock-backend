@@ -6,22 +6,94 @@ import { requirePermission } from "../../middleware/permission.middleware.js";
 
 const router = Router({ mergeParams: true });
 // Get All Org Documents
-router.get("/", authMiddleware, requirePermission("document.read"), getDocuments)
+router.get(
+  "/",
+  authMiddleware,
+  requirePermission("document.read"),
+  getDocuments
+)
 // Get Single Document
-router.get("/:docId", authMiddleware, requirePermission("document.read"), getSingleDocument)
+router.get(
+  "/:docId",
+  authMiddleware,
+  requirePermission("document.read", {
+    resourceType: "DOCUMENT",
+    resourceIdParam: "docId"
+  }),
+  getSingleDocument
+)
 // Create Dcoument
-router.post("/", authMiddleware, requirePermission("document.create"), uploadSingle('file'), createDocument)
+router.post(
+  "/",
+  authMiddleware,
+  requirePermission("document.create", {
+    resourceType: "DOCUMENT",
+    resourceIdBody: "folderId"
+  }),
+  uploadSingle('file'),
+  createDocument
+)
 // Update Document Version
-router.post("/:docId/versions", authMiddleware, requirePermission("document.update"), uploadSingle('file'), updateDocument)
+router.post(
+  "/:docId/versions",
+  authMiddleware,
+  requirePermission("document.update", {
+    resourceType: "DOCUMENT",
+    resourceIdParam: "docId"
+  }),
+  uploadSingle('file'),
+  updateDocument
+)
 // Get Document Version
-router.get("/:docId/versions", authMiddleware, requirePermission("document.update"), uploadSingle('file'), getDocumentVersions)
+router.get(
+  "/:docId/versions",
+  authMiddleware,
+  requirePermission("document.update", {
+    resourceType: "DOCUMENT",
+    resourceIdParam: "docId"
+  }),
+  uploadSingle('file'),
+  getDocumentVersions
+)
 // Rename Document
-router.patch("/:docId", authMiddleware, requirePermission("document.rename"), renameDocument)
+router.patch(
+  "/:docId",
+  authMiddleware,
+  requirePermission("document.rename", {
+    resourceType: "DOCUMENT",
+    resourceIdParam: "docId"
+  }),
+  renameDocument
+)
 // Move Document
-router.patch("/:docId/move", authMiddleware, requirePermission("document.move"), moveDocument)
+router.patch(
+  "/:docId/move",
+  authMiddleware,
+  requirePermission("document.move", {
+    resourceType: "DOCUMENT",
+    resourceIdParam: "docId"
+  }),
+  moveDocument
+)
 // Delete Document
-router.delete("/:docId", authMiddleware, requirePermission("document.delete"), deleteDocument)
+router.delete(
+  "/:docId",
+  authMiddleware,
+  requirePermission("document.delete", {
+    resourceType: "DOCUMENT",
+    resourceIdParam: "docId"
+  }),
+  deleteDocument
+)
 // Restore Document
-router.post("/:docId/restore", authMiddleware, requirePermission("document.restore"), restoreDocument)
+router.post(
+  "/:docId/restore",
+  authMiddleware,
+  requirePermission("document.restore", {
+    resourceType: "DOCUMENT",
+    resourceIdParam: "docId"
+  }),
+  restoreDocument
+)
 
 export default router;

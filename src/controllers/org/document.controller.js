@@ -20,11 +20,11 @@ export const getSingleDocument = async (req, res) => {
 export const createDocument = async (req, res) => {
   console.log("controller reached")
   const { orgId } = await req.params;
-  const { docName } = await req.body;
+  const { docName, folderId } = await req.body;
   const userId = req.user.id;
   const file = await req.file;
 
-  const result = await createDocumentService(Number(orgId), userId, docName, file, null);
+  const result = await createDocumentService(Number(orgId), userId, docName, file, folderId);
 
   return res.json(new ApiResponse(200, "Document created", result));
 }
@@ -34,7 +34,7 @@ export const updateDocument = async (req, res) => {
   const userId = req.user.id;
   const file = await req.file;
 
-  const result = await updateDocumentService(Number(orgId), userId, Number(docId), file, null);
+  const result = await updateDocumentService(Number(orgId), userId, Number(docId), file);
 
   return res.json(new ApiResponse(200, "Document created", result));
 }
