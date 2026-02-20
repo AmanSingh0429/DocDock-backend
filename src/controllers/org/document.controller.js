@@ -3,9 +3,9 @@ import { ApiResponse } from "../../utils/ApiResponse.js";
 
 export const getDocuments = async (req, res) => {
   console.log("controller reached")
-  const { orgId } = await req.params;
-
-  const result = await getDocumentsService(Number(orgId), null)
+  const { orgId, folderId } = await req.params;
+  const resolvedFolderId = folderId ?? null
+  const result = await getDocumentsService(Number(orgId), resolvedFolderId);
 
   return res.json(new ApiResponse(200, "Documents fetched successfully", result))
 }
@@ -19,12 +19,13 @@ export const getSingleDocument = async (req, res) => {
 }
 export const createDocument = async (req, res) => {
   console.log("controller reached")
-  const { orgId } = await req.params;
-  const { docName, folderId } = await req.body;
+  const { orgId, folderId } = await req.params;
+  const resolvedFolderId = folderId ?? null;
+  const { docName } = await req.body;
   const userId = req.user.id;
   const file = await req.file;
 
-  const result = await createDocumentService(Number(orgId), userId, docName, file, folderId);
+  const result = await createDocumentService(Number(orgId), userId, docName, file, resolvedFolderId);
 
   return res.json(new ApiResponse(200, "Document created", result));
 }
@@ -62,8 +63,9 @@ export const moveDocument = async (req, res) => {
   const { orgId, docId } = await req.params;
   const userId = req.user.id;
   const { destinationFolderId } = await req.body;
+  const resolvedFolderId = destinationFolderId ?? null
 
-  const result = await moveDocumentService(Number(orgId), userId, Number(docId), destinationFolderId);
+  const result = await moveDocumentService(Number(orgId), userId, Number(docId), resolvedFolderId);
 
   res.json(new ApiResponse(200, "Document created", result));
 }

@@ -5,13 +5,6 @@ import { uploadSingle } from "../../middleware/multer.middleware.js";
 import { requirePermission } from "../../middleware/permission.middleware.js";
 
 const router = Router({ mergeParams: true });
-// Get All Org Documents
-router.get(
-  "/",
-  authMiddleware,
-  requirePermission("document.read"),
-  getDocuments
-)
 // Get Single Document
 router.get(
   "/:docId",

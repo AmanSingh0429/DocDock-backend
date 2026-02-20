@@ -4,7 +4,6 @@ import { deleteFromCloudinary, uploadToCloudinary } from "../../utils/cloudinary
 import { createHash } from "crypto"
 
 export const getDocumentsService = async (orgId, folderId) => {
-  console.log("getAllDocumentsService reached")
   try {
     const allDocuments = await prisma.doc.findMany({
       where: {
