@@ -107,6 +107,9 @@ export const renameFolderService = async (orgId, userId, folderId, newFolderName
     if (!existingFolder) {
       throw new ApiError(404, "Folder does not exist")
     }
+    if (existingFolder.isRoot) {
+      throw new ApiError(400, "Invalid operation");
+    }
     if (existingFolder.name === cleanNewFolderName) {
       throw new ApiError(400, "New name must be different");
     }
@@ -146,7 +149,7 @@ export const renameFolderService = async (orgId, userId, folderId, newFolderName
   }
 }
 
-export const moveFolderService = async (orgId, userId, folderId, parentFolderId) => {
+export const moveFolderService = async (orgId, userId, folderId, destinationFolderId) => {
   //   Move A under B
 
   // 1) If A === B → reject
@@ -154,7 +157,7 @@ export const moveFolderService = async (orgId, userId, folderId, parentFolderId)
   // 3) If B exists in that list → reject
   // 4) Else → allow
   console.log("moveFolderService")
-  const parentId = parentFolderId ?? null
+  const parentId = destinationFolderId ?? null
   if (folderId == null) {
     throw new ApiError(400, "Folder id is required");
   }
@@ -173,6 +176,9 @@ export const moveFolderService = async (orgId, userId, folderId, parentFolderId)
     console.log({ existingFolder });
     if (!existingFolder) {
       throw new ApiError(404, "Folder not found")
+    }
+    if (existingFolder.isRoot) {
+      throw new ApiError(400, "Invalid operation");
     }
     if (existingFolder.id === parentId) {
       throw new ApiError(400, "Folder cannot be moved to itself")
@@ -264,6 +270,9 @@ export const deleteFolderService = async (orgId, userId, folderId) => {
     })
     if (!existingFolder) {
       throw new ApiError(404, "Folder not found")
+    }
+    if (existingFolder.isRoot) {
+      throw new ApiError(400, "Invalid operation");
     }
     const transactionResult = await prisma.$transaction(async (tx) => {
       const updatedFolders = await tx.$queryRaw`

@@ -20,7 +20,7 @@ router.post(
   "/",
   authMiddleware,
   requirePermission("document.create", {
-    resourceType: "DOCUMENT",
+    resourceType: "FOLDER",
     resourceIdBody: "folderId"
   }),
   uploadSingle('file'),
@@ -59,12 +59,16 @@ router.patch(
   renameDocument
 )
 // Move Document
-router.patch(
+router.post(
   "/:docId/move",
   authMiddleware,
   requirePermission("document.move", {
     resourceType: "DOCUMENT",
     resourceIdParam: "docId"
+  }),
+  requirePermission("document.create", {
+    resourceType: "FOLDER",
+    resourceIdBody: "destinationFolderId"
   }),
   moveDocument
 )

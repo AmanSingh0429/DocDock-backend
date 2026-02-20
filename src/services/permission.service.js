@@ -20,7 +20,7 @@ export const checkPermission = async (orgId, userId, permissionName, resourceTyp
   })
   if (!permission) { return false }
   const permissionId = permission.id
-  if (resourceType === "DOC") {
+  if (resourceType === "DOCUMENT") {
 
     const doc = await prisma.doc.findFirst({
       where: { id: resourceId, orgId },

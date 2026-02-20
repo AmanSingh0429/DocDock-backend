@@ -1,4 +1,3 @@
-import prisma from "../../../prisma/client.js";
 import { createDocumentService } from "../../services/org/document.service.js";
 import { createFolderService, deleteFolderService, getFolderContentsService, moveFolderService, renameFolderService, restoreFolderService } from "../../services/org/folder.service.js";
 import { ApiResponse } from "../../utils/ApiResponse.js";
@@ -34,9 +33,9 @@ export const renameFolder = async (req, res) => {
 export const moveFolder = async (req, res) => {
   const userId = await req.user.id
   const { orgId, folderId } = await req.params;
-  const { parentFolderId } = await req.body
+  const { destinationFolderId } = await req.body
 
-  const result = await moveFolderService(Number(orgId), userId, Number(folderId), parentFolderId)
+  const result = await moveFolderService(Number(orgId), userId, Number(folderId), destinationFolderId)
 
   return res.json(new ApiResponse(200, "Folder moved", result))
 };

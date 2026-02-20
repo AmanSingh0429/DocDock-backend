@@ -42,6 +42,10 @@ router.post(
     resourceType: "FOLDER",
     resourceIdParam: "folderId"
   }),
+  requirePermission("folder.create", {
+    resourceType: "FOLDER",
+    resourceIdBody: "destinationFolderId"
+  }),
   moveFolder
 )
 // Delete Folder

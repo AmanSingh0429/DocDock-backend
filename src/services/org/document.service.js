@@ -57,10 +57,43 @@ export const createDocumentService = async (orgId, userId, docName, file, folder
   try {
     cloudinaryResult = await uploadToCloudinary(file.buffer, resourceType)
     const transactionResult = await prisma.$transaction(async (tx) => {
+      let finalFolderId;
+
+      if (folderId) {
+        const folder = await tx.folder.findFirst({
+          where: {
+            id: folderId,
+            orgId,
+            deletedAt: null
+          },
+          select: { id: true }
+        });
+
+        if (!folder) {
+          throw new ApiError(404, "Parent folder not found");
+        }
+
+        finalFolderId = folder.id;
+      } else {
+        const rootFolder = await tx.folder.findFirst({
+          where: {
+            orgId,
+            isRoot: true,
+            deletedAt: null
+          },
+          select: { id: true }
+        });
+
+        if (!rootFolder) {
+          throw new ApiError(500, "Root folder not found");
+        }
+
+        finalFolderId = rootFolder.id;
+      }
       const createDoc = await tx.doc.create({
         data: {
           orgId,
-          folderId: folderId ?? null,
+          folderId: finalFolderId,
           createdBy: userId,
           name: docName,
         }
@@ -113,7 +146,7 @@ export const createDocumentService = async (orgId, userId, docName, file, folder
         }
       })
       console.log({ finalResult })
-      return { finalResult }
+      return finalResult
     })
 
     return transactionResult;

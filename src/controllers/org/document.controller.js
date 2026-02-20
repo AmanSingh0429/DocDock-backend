@@ -19,11 +19,11 @@ export const getSingleDocument = async (req, res) => {
 }
 export const createDocument = async (req, res) => {
   console.log("controller reached")
-  const { orgId, folderId } = await req.params;
-  const resolvedFolderId = folderId ?? null;
-  const { docName } = await req.body;
+  const { orgId } = await req.params;
+  const { docName, folderId } = await req.body;
   const userId = req.user.id;
   const file = await req.file;
+  const resolvedFolderId = folderId ?? null;
 
   const result = await createDocumentService(Number(orgId), userId, docName, file, resolvedFolderId);
 
