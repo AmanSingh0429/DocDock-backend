@@ -15,7 +15,14 @@ export const createOrgService = async (orgName, createdByID) => {
           createdBy: createdByID
         }
       })
-      console.log("org created:", org)
+      const createRootFolder = await tx.folder.create({
+        data: {
+          orgId: org.id,
+          createdBy: createdByID,
+          name: "__ROOT__",
+          isRoot: true
+        }
+      })
       // Add creator to org
       const orgUser = await tx.orgUser.create({
         data: {
@@ -23,26 +30,28 @@ export const createOrgService = async (orgName, createdByID) => {
           orgId: org.id
         }
       })
-      console.log("org user created:", orgUser)
       // Assign Admin role
-      const roles = await tx.roles.findMany();
-      const roleMap = Object.fromEntries(
-        roles.map((role) => [role.name, role.id])
-      );
+      const ownerRole = await tx.roles.findUnique({
+        where: { name: "OWNER" },
+        select: { id: true }
+      });
+
+      if (!ownerRole) {
+        throw new ApiError(500, "OWNER role not seeded");
+      }
       const assignRole = await tx.orgRole.create({
         data: {
-          roleId: roleMap.ADMIN,
+          roleId: ownerRole.id,
           orgId: org.id,
           userId: createdByID
         }
       })
-      console.log("role assigned:", assignRole)
       // Audit log
-      const audit = await tx.auditLogs.create({
+      const audit = await tx.auditLog.create({
         data: {
           orgId: org.id,
           actorUserId: createdByID,
-          action: "CREATE",
+          action: "CREATE_ORG",
           resourceType: "ORG",
           resourceId: org.id,
           metadata: {
@@ -50,16 +59,16 @@ export const createOrgService = async (orgName, createdByID) => {
           }
         }
       })
-      console.log("audit log created:", audit)
 
-      return { org, orgUser, assignRole, audit }
+      return { org }
     })
     return results
   } catch (error) {
+    console.log(error)
     if (error instanceof ApiError) {
       throw error;
     }
-    throw new ApiError(500, "Failed to create org", error);
+    throw new ApiError(500, "Failed to create org", error, false);
   }
 
 };

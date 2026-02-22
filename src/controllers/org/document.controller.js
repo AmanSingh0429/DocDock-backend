@@ -1,3 +1,4 @@
+import { deleteDocPermissionService, setDocPermissionService } from "../../services/acl.service.js";
 import { createDocumentService, deleteDocumentService, getDocumentsService, getDocumentVersionsService, getSingleDocumentService, moveDocumentService, renameDocumentService, restoreDocumentService, updateDocumentService } from "../../services/org/document.service.js";
 import { ApiResponse } from "../../utils/ApiResponse.js";
 
@@ -89,3 +90,23 @@ export const restoreDocument = async (req, res) => {
 
   res.json(new ApiResponse(200, "Document restored", result))
 }
+
+export const modifyDocPermissions = async (req, res) => {
+  const { orgId, docId } = req.params;
+  const userId = req.user.id;
+  const { targetUserId, permissionName, effect } = await req.body;
+
+  const result = await setDocPermissionService(Number(orgId), Number(targetUserId), Number(docId), userId, permissionName, effect
+  );
+
+  res.json(new ApiResponse(200, "Permission modified successfully", result));
+};
+export const deleteDocPermission = async (req, res) => {
+  const { orgId, docId } = req.params;
+  const userId = req.user.id;
+  const { targetUserId, permissionName } = await req.body;
+
+  const result = await deleteDocPermissionService(Number(orgId), Number(targetUserId), Number(docId), userId, permissionName);
+
+  res.json(new ApiResponse(200, "Permission deleted successfully", result));
+};

@@ -6,6 +6,7 @@ const main = async () => {
       { name: "ADMIN" },
       { name: "VIEWER" },
       { name: "EDITOR" },
+      { name: "OWNER" },
     ],
     skipDuplicates: true
   })
@@ -31,20 +32,17 @@ const main = async () => {
 
       // Org 
       { name: "org.read" },
-      { name: "org.rename" },
+      { name: "org.update" },
       { name: "org.delete" },
-
+      // ACL
+      { name: "org.acl.manage" },
       // Org users
       { name: "org.user.add" },
       { name: "org.user.remove" },
       { name: "org.user.update_role" },
 
-      // Roles & permissions
-      { name: "org.role.assign" },
-      { name: "org.role.remove" },
-
       // Audit
-      { name: "audit.read" },
+      { name: "org.audit.read" },
     ],
     skipDuplicates: true,
   });
@@ -62,6 +60,13 @@ const main = async () => {
   await prisma.rolePermission.createMany({
     data: permissionIds.map((permissionId) => ({
       roleId: roleMap.ADMIN,
+      permissionId,
+    })),
+    skipDuplicates: true,
+  });
+  await prisma.rolePermission.createMany({
+    data: permissionIds.map((permissionId) => ({
+      roleId: roleMap.OWNER,
       permissionId,
     })),
     skipDuplicates: true,

@@ -7,7 +7,7 @@ import folderRouter from './folder.route.js'
 
 const router = Router();
 
-router.post("/create", authMiddleware, createOrg);
+router.post("/", authMiddleware, createOrg);
 router.get("/:orgId/documents", authMiddleware, requirePermission("document.read"), (req, res) => { });
 
 // Document Routes

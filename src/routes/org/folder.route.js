@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createDocInFolder, createFolder, deleteFolder, getFolderContents, moveFolder, renameFolder, restoreFolder } from "../../controllers/org/folder.controller.js";
+import { createFolder, deleteFolder, deleteFolderPermission, getFolderContents, modifyFolderPermission, moveFolder, renameFolder, restoreFolder } from "../../controllers/org/folder.controller.js";
 import { authMiddleware } from "../../middleware/auth.middleware.js";
 import { requirePermission } from "../../middleware/permission.middleware.js";
 
@@ -68,7 +68,18 @@ router.post(
   }),
   restoreFolder
 )
-
-router.post(":folderId/docs", createDocInFolder)
+// Manage Folder Permissions
+router.post(
+  "/:folderId/permissions",
+  authMiddleware,
+  requirePermission("org.acl.manage"),
+  modifyFolderPermission
+)
+router.delete(
+  "/:folderId/permissions",
+  authMiddleware,
+  requirePermission("org.acl.manage"),
+  deleteFolderPermission
+)
 
 export default router

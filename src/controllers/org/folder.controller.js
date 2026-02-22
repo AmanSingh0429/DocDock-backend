@@ -1,3 +1,4 @@
+import { deleteFolderPermissionService, setFolderPermissionService } from "../../services/acl.service.js";
 import { createDocumentService } from "../../services/org/document.service.js";
 import { createFolderService, deleteFolderService, getFolderContentsService, moveFolderService, renameFolderService, restoreFolderService } from "../../services/org/folder.service.js";
 import { ApiResponse } from "../../utils/ApiResponse.js";
@@ -68,3 +69,23 @@ export const createDocInFolder = async (req, res) => {
 
   return res.json(new ApiResponse(200, "Document created", result));
 }
+
+export const modifyFolderPermission = async (req, res) => {
+  const { orgId, folderId } = await req.params;
+  const userId = req.user.id;
+  const { targetUserId, permissionName, effect } = await req.body;
+
+  const result = await setFolderPermissionService(Number(orgId), Number(targetUserId), Number(folderId), userId, permissionName, effect);
+
+  res.json(new ApiResponse(200, "Permission modified successfully", result));
+};
+
+export const deleteFolderPermission = async (req, res) => {
+  const { orgId, folderId } = await req.params;
+  const userId = req.user.id;
+  const { targetUserId, permissionName } = await req.body;
+
+  const result = await deleteFolderPermissionService(Number(orgId), Number(targetUserId), Number(folderId), userId, permissionName);
+
+  res.json(new ApiResponse(200, "Permission deleted successfully", result));
+};
