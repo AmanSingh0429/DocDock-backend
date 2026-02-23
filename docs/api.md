@@ -111,6 +111,20 @@ Marks a document as deleted.
 Restores a previously deleted document.
 
 ---
+## 🔹 Modify Document Permission
+
+`POST /api/v1/orgs/:orgId/docs/:docId/permissions`
+
+Explicit changes to doc permissions based on effect(ALLOW/DENY)  
+
+---
+## 🔹 Delete Document Permission
+
+`DELETE /api/v1/orgs/:orgId/docs/:docId/permissions`
+
+Delete the explicit permission
+
+---
 
 # 📁 Folder Endpoints
 
@@ -161,3 +175,70 @@ Recursively marks a folder and its contents as deleted.
 `POST /api/v1/orgs/:orgId/folders/:folderId/restore`
 
 Recursively restores a previously deleted folder and its contents.
+
+---
+## 🔹 Modify Folder Permission
+
+`POST /api/v1/orgs/:orgId/docs/:folderId/permissions`
+
+Explicit changes to a folder permissions based on effect(ALLOW/DENY)  
+
+---
+
+## 🔹 Delete Folder Permission
+
+`DELETE /api/v1/orgs/:orgId/docs/:folderId/permissions`
+
+Deletes the explicit permission
+
+# 🌐 Org Endpoints
+
+---
+
+## 🔹 Create Org
+
+`POST /api/v1/orgs/`
+
+Creates a new org.
+
+---
+
+## 🔹 Get Root Org Resources
+
+`GET /api/v1/orgs/:orgId`
+
+Returns all org level resources
+
+---
+
+## 🔹 Rename Org
+
+`PATCH /api/v1/orgs/:orgId`
+
+Renames org
+
+---
+
+## 🔹 Leave Org
+
+`DELETE /api/v1/orgs/:orgId/leave`
+
+Leave current org
+
+---
+
+## 🔹 Assign Roles
+
+`POST /api/v1/orgs/:orgId/role`
+
+Assign users different roles
+
+---
+
+## 🔹 Remove User
+
+`DELETE /api/v1/orgs/:orgId/remove`
+
+Remove a user from org
+
+---

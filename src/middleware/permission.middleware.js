@@ -1,3 +1,4 @@
+import prisma from "../../prisma/client.js";
 import { checkPermission } from "../services/permission.service.js";
 import { ApiError } from "../utils/ApiError.js";
 
@@ -6,7 +7,8 @@ export const requirePermission = (
   {
     resourceType = null,
     resourceIdParam = null,
-    resourceIdBody = null
+    resourceIdBody = null,
+    resourceResolver = null
   } = {}
 ) => {
   return async (req, res, next) => {
@@ -38,6 +40,20 @@ export const requirePermission = (
         throw new ApiError(400, `${resourceIdBody} required`);
       }
     }
+
+    if (resourceResolver === "ROOT") {
+      const rootFolder = await prisma.folder.findFirst({
+        where: {
+          orgId,
+          isRoot: true,
+          deletedAt: null
+        },
+        select: { id: true }
+      });
+
+      resourceId = rootFolder.id;
+    }
+
 
     const allowed = await checkPermission(
       orgId,
