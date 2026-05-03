@@ -1,4 +1,4 @@
-import { acceptInvitationService, createOrgInvitationService, listOrgInvitationsService, revokeInvitationService } from "../../services/org/invitations.service.js";
+import { acceptInvitationService, createOrgInvitationService, getInvitationByTokenService, listOrgInvitationsService, revokeInvitationService } from "../../services/org/invitations.service.js";
 import { ApiResponse } from "../../utils/ApiResponse.js";
 
 export const createOrgInvitation = async (req, res) => {
@@ -36,5 +36,16 @@ export const listOrgInvitations = async (req, res) => {
   res.status(200).json({
     success: true,
     data: invitations
+  });
+};
+
+export const getInvitationByToken = async (req, res) => {
+  const { token } = req.params;
+
+  const data = await getInvitationByTokenService(token);
+
+  res.status(200).json({
+    success: true,
+    data
   });
 };

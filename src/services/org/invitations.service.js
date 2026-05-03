@@ -276,3 +276,45 @@ export const listOrgInvitationsService = async (orgId) => {
     throw new ApiError(500, "Failed to list org invitations", error, false)
   }
 };
+
+export const getInvitationByTokenService = async (token) => {
+  const invitation = await prisma.orgInvitation.findUnique({
+    where: { token },
+    include: {
+      org: {
+        select: {
+          id: true,
+          name: true
+        }
+      },
+      role: {
+        select: {
+          id: true,
+          name: true
+        }
+      },
+      inviter: {
+        select: {
+          name: true,
+          email: true
+        }
+      }
+    }
+  });
+
+  if (!invitation) {
+    throw new ApiError(404, "Invalid invitation");
+  }
+
+  if (invitation.expiresAt < new Date()) {
+    throw new ApiError(400, "Invitation expired");
+  }
+
+  return {
+    org: invitation.org,
+    role: invitation.role,
+    invitedBy: invitation.inviter,
+    email: invitation.email,
+    expiresAt: invitation.expiresAt
+  };
+};
