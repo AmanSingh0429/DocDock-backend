@@ -1,5 +1,8 @@
 # 🚀 DocDock — Multi-Tenant Document Management System
 
+[![Run in Postman](https://run.pstmn.io/button.svg)](https://schema.getpostman.com/json/collection/v2.1.0/collection.json)
+[![View API Docs](https://img.shields.io/badge/View-API%20Docs-0072F5?style=for-the-badge)](docs/api.md)
+
 **DocDock** is a SaaS-ready, production-grade backend system for managing documents with:
 
 - Version control  
