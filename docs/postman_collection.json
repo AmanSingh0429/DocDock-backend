@@ -16,7 +16,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"email\":\"test@test.com\",\r\n    \"password\":\"password@123\"\r\n}",
+              "raw": "{\r\n    \"email\":\"abc@xyz.com\",\r\n    \"password\":\"password@123\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -25,11 +25,9 @@
             },
             "url": {
               "raw": "{{base_url}}/api/v1/auth/login",
-              "protocol": "http",
               "host": [
-                "localhost"
+                "{{base_url}}"
               ],
-              "port": "5000",
               "path": [
                 "api",
                 "v1",
@@ -48,16 +46,6 @@
         {
           "name": "Create Doc",
           "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{auth_token}}",
-                  "type": "string"
-                }
-              ]
-            },
             "method": "POST",
             "header": [],
             "body": {
@@ -73,17 +61,15 @@
                   "key": "file",
                   "type": "file",
                   "uuid": "76df56a6-9f94-402c-aeac-80256ae35e20",
-                  "src": "/C:/Users/Lenovo/Pictures/wallpapers/123.jpg"
+                  "src": "/C:/Users/Lenovo/Pictures/wallpapers/9b456155cd35f9bdfcbca58b397edb75.jpg"
                 }
               ]
             },
             "url": {
               "raw": "{{base_url}}/api/v1/orgs/3/docs",
-              "protocol": "http",
               "host": [
-                "localhost"
+                "{{base_url}}"
               ],
-              "port": "5000",
               "path": [
                 "api",
                 "v1",
@@ -98,16 +84,6 @@
         {
           "name": "Update Document Version",
           "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{auth_token}}",
-                  "type": "string"
-                }
-              ]
-            },
             "method": "POST",
             "header": [],
             "body": {
@@ -117,17 +93,15 @@
                   "key": "file",
                   "type": "file",
                   "uuid": "6a88df72-97a6-440e-bd46-909abc1193f6",
-                  "src": "/C:/Users/Lenovo/Pictures/wallpapers/123.jpg"
+                  "src": "/C:/Users/Lenovo/Pictures/wallpapers/9b456155cd35f9bdfcbca58b397edb75.jpg"
                 }
               ]
             },
             "url": {
               "raw": "{{base_url}}/api/v1/orgs/3/docs/3/versions",
-              "protocol": "http",
               "host": [
-                "localhost"
+                "{{base_url}}"
               ],
-              "port": "5000",
               "path": [
                 "api",
                 "v1",
@@ -152,16 +126,6 @@
         {
           "name": "Rename Document",
           "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{auth_token}}",
-                  "type": "string"
-                }
-              ]
-            },
             "method": "PATCH",
             "header": [],
             "body": {
@@ -175,11 +139,9 @@
             },
             "url": {
               "raw": "{{base_url}}/api/v1/orgs/3/docs/4",
-              "protocol": "http",
               "host": [
-                "localhost"
+                "{{base_url}}"
               ],
-              "port": "5000",
               "path": [
                 "api",
                 "v1",
@@ -195,25 +157,13 @@
         {
           "name": "Get Documents",
           "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{auth_token}}",
-                  "type": "string"
-                }
-              ]
-            },
             "method": "GET",
             "header": [],
             "url": {
               "raw": "{{base_url}}/api/v1/orgs/3/docs/4",
-              "protocol": "http",
               "host": [
-                "localhost"
+                "{{base_url}}"
               ],
-              "port": "5000",
               "path": [
                 "api",
                 "v1",
@@ -229,25 +179,13 @@
         {
           "name": "Get Document Versions",
           "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{auth_token}}",
-                  "type": "string"
-                }
-              ]
-            },
             "method": "GET",
             "header": [],
             "url": {
               "raw": "{{base_url}}/api/v1/orgs/3/docs/4",
-              "protocol": "http",
               "host": [
-                "localhost"
+                "{{base_url}}"
               ],
-              "port": "5000",
               "path": [
                 "api",
                 "v1",
@@ -263,25 +201,13 @@
         {
           "name": "Delete Document",
           "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{auth_token}}",
-                  "type": "string"
-                }
-              ]
-            },
             "method": "DELETE",
             "header": [],
             "url": {
               "raw": "{{base_url}}/api/v1/orgs/3/docs/1",
-              "protocol": "http",
               "host": [
-                "localhost"
+                "{{base_url}}"
               ],
-              "port": "5000",
               "path": [
                 "api",
                 "v1",
@@ -297,25 +223,13 @@
         {
           "name": "Restore Document",
           "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{auth_token}}",
-                  "type": "string"
-                }
-              ]
-            },
             "method": "POST",
             "header": [],
             "url": {
               "raw": "{{base_url}}/api/v1/orgs/3/docs/1/restore",
-              "protocol": "http",
               "host": [
-                "localhost"
+                "{{base_url}}"
               ],
-              "port": "5000",
               "path": [
                 "api",
                 "v1",
@@ -350,11 +264,9 @@
             },
             "url": {
               "raw": "{{base_url}}/api/v1/orgs/3/folder",
-              "protocol": "http",
               "host": [
-                "localhost"
+                "{{base_url}}"
               ],
-              "port": "5000",
               "path": [
                 "api",
                 "v1",
@@ -369,16 +281,6 @@
         {
           "name": "Rename Folder",
           "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{auth_token}}",
-                  "type": "string"
-                }
-              ]
-            },
             "method": "PATCH",
             "header": [],
             "body": {
@@ -392,11 +294,9 @@
             },
             "url": {
               "raw": "{{base_url}}/api/v1/orgs/3/folder/3",
-              "protocol": "http",
               "host": [
-                "localhost"
+                "{{base_url}}"
               ],
-              "port": "5000",
               "path": [
                 "api",
                 "v1",
@@ -412,16 +312,6 @@
         {
           "name": "Move Folder",
           "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{auth_token}}",
-                  "type": "string"
-                }
-              ]
-            },
             "method": "POST",
             "header": [],
             "body": {
@@ -435,11 +325,9 @@
             },
             "url": {
               "raw": "{{base_url}}/api/v1/orgs/3/folder/9/move",
-              "protocol": "http",
               "host": [
-                "localhost"
+                "{{base_url}}"
               ],
-              "port": "5000",
               "path": [
                 "api",
                 "v1",
@@ -456,16 +344,6 @@
         {
           "name": "Delete Folder",
           "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{auth_token}}",
-                  "type": "string"
-                }
-              ]
-            },
             "method": "DELETE",
             "header": [],
             "body": {
@@ -479,11 +357,9 @@
             },
             "url": {
               "raw": "{{base_url}}/api/v1/orgs/3/folder/3",
-              "protocol": "http",
               "host": [
-                "localhost"
+                "{{base_url}}"
               ],
-              "port": "5000",
               "path": [
                 "api",
                 "v1",
@@ -499,25 +375,13 @@
         {
           "name": "Restore Document",
           "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{auth_token}}",
-                  "type": "string"
-                }
-              ]
-            },
             "method": "POST",
             "header": [],
             "url": {
               "raw": "{{base_url}}/api/v1/orgs/3/folder/3/restore",
-              "protocol": "http",
               "host": [
-                "localhost"
+                "{{base_url}}"
               ],
-              "port": "5000",
               "path": [
                 "api",
                 "v1",
@@ -545,11 +409,9 @@
             },
             "url": {
               "raw": "{{base_url}}/api/v1/orgs/3/folder/3",
-              "protocol": "http",
               "host": [
-                "localhost"
+                "{{base_url}}"
               ],
-              "port": "5000",
               "path": [
                 "api",
                 "v1",
@@ -583,11 +445,9 @@
             },
             "url": {
               "raw": "{{base_url}}/api/v1/orgs/",
-              "protocol": "http",
               "host": [
-                "localhost"
+                "{{base_url}}"
               ],
-              "port": "5000",
               "path": [
                 "api",
                 "v1",
@@ -612,11 +472,9 @@
             },
             "url": {
               "raw": "{{base_url}}/api/v1/orgs/3",
-              "protocol": "http",
               "host": [
-                "localhost"
+                "{{base_url}}"
               ],
-              "port": "5000",
               "path": [
                 "api",
                 "v1",
@@ -643,11 +501,9 @@
             },
             "url": {
               "raw": "{{base_url}}/api/v1/orgs/5",
-              "protocol": "http",
               "host": [
-                "localhost"
+                "{{base_url}}"
               ],
-              "port": "5000",
               "path": [
                 "api",
                 "v1",
@@ -668,14 +524,11 @@
               "raw": ""
             },
             "url": {
-              "raw": "{{base_url}}/api/v1/orgs/11/leave",
-              "protocol": "http",
+              "raw": "{{base_url}}api/v1/orgs/11/leave",
               "host": [
-                "localhost"
+                "{{base_url}}api"
               ],
-              "port": "5000",
               "path": [
-                "api",
                 "v1",
                 "orgs",
                 "11",
@@ -701,11 +554,9 @@
             },
             "url": {
               "raw": "{{base_url}}/api/v1/orgs/3/role",
-              "protocol": "http",
               "host": [
-                "localhost"
+                "{{base_url}}"
               ],
-              "port": "5000",
               "path": [
                 "api",
                 "v1",
@@ -733,17 +584,154 @@
             },
             "url": {
               "raw": "{{base_url}}/api/v1/orgs/3/role",
-              "protocol": "http",
               "host": [
-                "localhost"
+                "{{base_url}}"
               ],
-              "port": "5000",
               "path": [
                 "api",
                 "v1",
                 "orgs",
                 "3",
                 "role"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Invite",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\":\"abc@xyz.com\",\r\n    \"role\":\"ADMIN\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/orgs/3/invitations/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "orgs",
+                "3",
+                "invitations",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Pending Invites",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\":\"abc@xyz.com\",\r\n    \"role\":\"ADMIN\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/orgs/3/invitations/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "orgs",
+                "3",
+                "invitations",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Accept Invite",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\":\"abc@xyz.com\",\r\n    \"role\":\"ADMIN\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/orgs/3/invitations/accept?token=26521c30d05753c9add7703cf76bb814cb5257335c4c430449efdb75c1dc9bd6",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "orgs",
+                "3",
+                "invitations",
+                "accept"
+              ],
+              "query": [
+                {
+                  "key": "token",
+                  "value": "26521c30d05753c9add7703cf76bb814cb5257335c4c430449efdb75c1dc9bd6"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Revoke Invite",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\":\"abc@xyz.com\",\r\n    \"role\":\"ADMIN\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/orgs/3/invitations/revoke?token=26521c30d05753c9add7703cf76bb814cb5257335c4c430449efdb75c1dc9bd6",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "orgs",
+                "3",
+                "invitations",
+                "revoke"
+              ],
+              "query": [
+                {
+                  "key": "token",
+                  "value": "26521c30d05753c9add7703cf76bb814cb5257335c4c430449efdb75c1dc9bd6"
+                }
               ]
             }
           },
@@ -759,7 +747,7 @@
           "bearer": [
             {
               "key": "token",
-              "value": "{{auth_token}}",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzcwMDIyNzI4LCJleHAiOjE3NzAxMDkxMjh9.AsvY0m85cS7qAnwx8Lqwd5b04fCFZY2u8geHfBRAYWg",
               "type": "string"
             }
           ]
@@ -767,7 +755,7 @@
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "{{base_url}}/api/v1/user/orgs",
+          "raw": "http://localhost:5000/api/v1/user/orgs",
           "protocol": "http",
           "host": [
             "localhost"
@@ -820,6 +808,11 @@
   ],
   "variable": [
     {
+      "key": "base_url",
+      "value": ""
+    },
+    {
+      "key": "auth_token",
       "value": ""
     }
   ]

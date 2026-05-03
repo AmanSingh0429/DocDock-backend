@@ -111,6 +111,7 @@ Marks a document as deleted.
 Restores a previously deleted document.
 
 ---
+
 ## 🔹 Modify Document Permission
 
 `POST /api/v1/orgs/:orgId/docs/:docId/permissions`
@@ -118,6 +119,7 @@ Restores a previously deleted document.
 Explicit changes to doc permissions based on effect(ALLOW/DENY)  
 
 ---
+
 ## 🔹 Delete Document Permission
 
 `DELETE /api/v1/orgs/:orgId/docs/:docId/permissions`
@@ -177,6 +179,7 @@ Recursively marks a folder and its contents as deleted.
 Recursively restores a previously deleted folder and its contents.
 
 ---
+
 ## 🔹 Modify Folder Permission
 
 `POST /api/v1/orgs/:orgId/docs/:folderId/permissions`
@@ -242,3 +245,33 @@ Assign users different roles
 Remove a user from org
 
 ---
+
+## 🔹 Invite User
+
+`POST /api/v1/orgs/:orgId/invitations/`
+
+Invite a user to Org
+
+---
+
+## 🔹 Accept Invitation
+
+`POST /api/v1/orgs/:orgId/invitations/accept?token=`
+
+Invite a user to Org
+
+---
+
+## 🔹 Revoke Invitation
+
+`DELETE /api/v1/orgs/:orgId/invitations/revoke?token=`
+
+Revoke a invitation
+
+---
+
+## 🔹 Get Invitation
+
+`GET /api/v1/orgs/:orgId/invitations/`
+
+Get all pending org invitations

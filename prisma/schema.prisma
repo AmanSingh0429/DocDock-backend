@@ -23,19 +23,21 @@ model User {
   createdOrgs         Org[]
   roles               OrgRole[]
   orgs                OrgUser[]
+  orgInvitations      OrgInvitation[]
 }
 
 model Org {
-  id            Int        @id @default(autoincrement())
-  name          String
-  createdBy     Int
-  createdAt     DateTime   @default(now())
-  auditLogs     AuditLog[]
-  docs          Doc[]
-  folders       Folder[]
-  createdByUser User       @relation(fields: [createdBy], references: [id])
-  roles         OrgRole[]
-  users         OrgUser[]
+  id             Int             @id @default(autoincrement())
+  name           String
+  createdBy      Int
+  createdAt      DateTime        @default(now())
+  auditLogs      AuditLog[]
+  docs           Doc[]
+  folders        Folder[]
+  createdByUser  User            @relation(fields: [createdBy], references: [id])
+  roles          OrgRole[]
+  users          OrgUser[]
+  orgInvitations OrgInvitation[]
 }
 
 model OrgUser {
@@ -53,6 +55,7 @@ model Roles {
   name            String           @unique
   orgRoles        OrgRole[]
   rolePermissions RolePermission[]
+  orgInvitations  OrgInvitation[]
 }
 
 model Permissions {
@@ -178,4 +181,19 @@ model DocPermission {
 enum PermissionEffect {
   ALLOW
   DENY
+}
+
+model OrgInvitation {
+  id        Int      @id @default(autoincrement())
+  orgId     Int
+  email     String
+  roleId    Int
+  token     String   @unique
+  expiresAt DateTime
+  invitedBy Int
+  createdAt DateTime @default(now())
+
+  org     Org   @relation(fields: [orgId], references: [id])
+  role    Roles @relation(fields: [roleId], references: [id])
+  inviter User  @relation(fields: [invitedBy], references: [id])
 }

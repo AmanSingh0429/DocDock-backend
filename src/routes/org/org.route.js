@@ -4,6 +4,7 @@ import { requirePermission } from "../../middleware/permission.middleware.js";
 import { assignUserRole, createOrg, getRootOrgResources, leaveOrg, removeUser, renameOrg } from "../../controllers/org/org.controller.js";
 import documentRouter from "./document.route.js"
 import folderRouter from './folder.route.js'
+import invitationsRouter from './invitations.route.js'
 
 const router = Router();
 // Create Org
@@ -54,5 +55,7 @@ router.delete(
 router.use("/:orgId/docs", documentRouter)
 // Folder Routes
 router.use("/:orgId/folder", folderRouter)
+// Org Invitations
+router.use("/:orgId/invitations", invitationsRouter)
 
 export default router;
