@@ -194,6 +194,8 @@ Explicit changes to a folder permissions based on effect(ALLOW/DENY)
 
 Deletes the explicit permission
 
+---
+
 # 🌐 Org Endpoints
 
 ---
@@ -275,3 +277,25 @@ Revoke a invitation
 `GET /api/v1/orgs/:orgId/invitations/`
 
 Get all pending org invitations
+
+---
+
+# 🔑 Auth Endpoints
+
+---
+
+## 🔹 Login
+
+`POST /api/v1/auth/login`
+
+Login to get token
+
+---
+
+## 🔹 Register
+
+`POST /api/v1/auth/Register`
+
+Register user
+
+---

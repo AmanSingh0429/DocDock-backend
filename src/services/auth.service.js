@@ -10,10 +10,10 @@ export const loginService = async (email, password) => {
     if (!user) {
       throw new ApiError(401, "Invalid credentials email")
     }
-    // const valid = await bcrypt.compare(password, user.passwordHash);
-    // if (!valid) {
-    //   throw new ApiError(401, "Invalid credentials password");
-    // }
+    const valid = await bcrypt.compare(password, user.passwordHash);
+    if (!valid) {
+      throw new ApiError(401, "Invalid credentials password");
+    }
 
     const token = signToken({ id: user.id });
 
