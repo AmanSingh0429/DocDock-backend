@@ -1,6 +1,6 @@
 import prisma from "../../../prisma/client.js";
 import { ApiError } from "../../utils/ApiError.js";
-import { deleteFromCloudinary, uploadToCloudinary } from "../../utils/cloudinary.js";
+import { storage } from "../../utils/cloudinary.js";
 import { createHash } from "crypto"
 
 export const getDocumentsService = async (orgId, folderId) => {
@@ -42,7 +42,7 @@ export const getSingleDocumentService = async (orgId, docId) => {
     throw new ApiError(500, "Failed to fetch document", error, false)
   }
 }
-export const createDocumentService = async (orgId, userId, docName, file, folderId) => {
+export const createDocumentService = async (orgId, userId, docName, file, folderId, storageService = storage) => {
   console.log("createDocumentService reached")
 
   if (!docName || !file) {
@@ -55,7 +55,7 @@ export const createDocumentService = async (orgId, userId, docName, file, folder
       : "raw";
   let cloudinaryResult;
   try {
-    cloudinaryResult = await uploadToCloudinary(file.buffer, resourceType)
+    cloudinaryResult = await storageService.upload(file.buffer, resourceType)
     const transactionResult = await prisma.$transaction(async (tx) => {
       let finalFolderId;
 
@@ -157,7 +157,7 @@ export const createDocumentService = async (orgId, userId, docName, file, folder
       throw error;
     }
     if (cloudinaryResult?.publicId) {
-      await deleteFromCloudinary(cloudinaryResult.publicId, resourceType);
+      await storageService.delete(cloudinaryResult.publicId, resourceType);
     }
     // Error from Prisma if document with same name already exists
     if (error.code === "P2002") {
@@ -170,7 +170,7 @@ export const createDocumentService = async (orgId, userId, docName, file, folder
   }
 
 }
-export const updateDocumentService = async (orgId, userId, docId, file) => {
+export const updateDocumentService = async (orgId, userId, docId, file, storageService = storage) => {
   console.log("updateDocumentService reached")
   if (!docId || !file) {
     throw new ApiError(400, "Document ID & file is required");
@@ -191,7 +191,7 @@ export const updateDocumentService = async (orgId, userId, docId, file) => {
       : "raw";
   let cloudinaryResult;
   try {
-    cloudinaryResult = await uploadToCloudinary(file.buffer, resourceType)
+    cloudinaryResult = await storageService.upload(file.buffer, resourceType)
     const transactionResult = await prisma.$transaction(async (tx) => {
       const fileHash = createHash("sha256").update(file.buffer).digest("hex")
       const lastVersion = await tx.docVersion.findFirst({
@@ -254,7 +254,7 @@ export const updateDocumentService = async (orgId, userId, docId, file) => {
       throw error
     }
     if (cloudinaryResult?.publicId) {
-      await deleteFromCloudinary(cloudinaryResult.publicId, resourceType);
+      await storageService.delete(cloudinaryResult.publicId, resourceType);
     }
     // Error if document with same docId and versionNumber exists
     if (error.code === "P2002") {

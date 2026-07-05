@@ -49,3 +49,8 @@ export const deleteFromCloudinary = async (publicId, resourceType) => {
   });
   console.log("after delete")
 };
+
+export const storage = {
+  upload: uploadToCloudinary,
+  delete: deleteFromCloudinary
+}
