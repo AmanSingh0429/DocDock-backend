@@ -66,3 +66,12 @@ export const createBaseSetup = async () => {
     folder,
   };
 };
+
+export const createOrgMember = async (orgId, userId) => {
+  return prisma.orgUser.create({
+    data: {
+      orgId,
+      userId,
+    },
+  });
+};
