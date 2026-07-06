@@ -357,7 +357,7 @@ export const removeUserService = async (orgId, modifierUserId, targetUserId) => 
     }
 
     const transactionResult = await prisma.$transaction(async (tx) => {
-      const ownerRole = await prisma.roles.findUnique({
+      const ownerRole = await tx.roles.findUnique({
         where: { name: "OWNER" },
         select: { id: true }
       })
@@ -399,7 +399,7 @@ export const removeUserService = async (orgId, modifierUserId, targetUserId) => 
           userId: targetUserId,
         }
       })
-      await tx.orgUser.delete({
+      const removeUser = await tx.orgUser.delete({
         where: {
           userId_orgId: {
             userId: targetUserId,
