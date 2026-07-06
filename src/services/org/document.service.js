@@ -473,7 +473,7 @@ export const deleteDocumentService = async (orgId, docId, userId) => {
 
 }
 
-export const restoreDocumentService = async (orgId, docId, userId, folderId) => {
+export const restoreDocumentService = async (orgId, docId, userId, targetFolderId = null) => {
   try {
     const existingDoc = await prisma.doc.findFirst({
       where: {
@@ -487,21 +487,47 @@ export const restoreDocumentService = async (orgId, docId, userId, folderId) => 
     if (existingDoc.deletedAt == null) {
       throw new ApiError(400, "Document is not deleted");
     }
-    let restoreFolderId = existingDoc.folderId;
+    let restoreFolderId;
 
-    if (restoreFolderId !== null) {
-      const folder = await prisma.folder.findFirst({
+    if (targetFolderId !== null) {
+      const targetFolder = await prisma.folder.findFirst({
+        where: {
+          id: targetFolderId,
+          orgId,
+          deletedAt: null
+        }
+      })
+      if (!targetFolder) {
+        throw new ApiError(404, "Target folder not found");
+      }
+      restoreFolderId = targetFolderId;
+    } else {
+      restoreFolderId = existingDoc.folderId
+
+      const existingFolder = await prisma.folder.findFirst({
         where: {
           id: restoreFolderId,
           orgId,
           deletedAt: null
         }
-      });
+      })
 
-      if (!folder) {
-        restoreFolderId = null;
+      if (!existingFolder) {
+        const rootFolder = await prisma.folder.findFirst({
+          where: {
+            orgId,
+            isRoot: true,
+          },
+        });
+        if (!rootFolder) {
+          throw new ApiError(500, "Root folder not found");
+        }
+        restoreFolderId = rootFolder.id;
+      } else {
+        restoreFolderId = existingFolder.id;
       }
     }
+
     const transactionResult = await prisma.$transaction(async (tx) => {
       const restore = await tx.doc.update({
         where: {
