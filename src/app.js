@@ -1,11 +1,14 @@
 import express from "express"
 import cors from "cors"
 import cookieParser from "cookie-parser"
+import swaggerUi from "swagger-ui-express";
+
 import errorHandler from "./middleware/error.middleware.js"
 
 import userRouter from "./routes/user.routes.js"
 import authRouter from "./routes/auth.route.js"
 import orgRouter from "./routes/org/org.route.js"
+import { swaggerSpec } from "../docs/swagger.js";
 
 
 const app = express()
@@ -22,6 +25,7 @@ app.get("/", (req, res) => {
   res.json({ message: "API is running 🚀" });
 });
 
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.use("/api/v1/user", userRouter)
 app.use("/api/v1/auth", authRouter)
