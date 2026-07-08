@@ -1,0 +1,124 @@
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: John Doe
+        email:
+          type: string
+          example: jhon@example.com
+        passwordHash:
+          type: string
+          example: $2b$10$R9lV2VXxN4bG5v1Z8eT2N6B6B6B6B6B6B6B6B6B6B6B6B6B6
+        image:
+          type: string
+          example: https://example.com/image.jpg
+        createdAt:
+          type: string
+          example: 2022-01-01T00:00:00.000Z
+
+    Organization:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Acme Corp
+        createdBy:
+          type: integer
+          example: 1
+        createdAt:
+          type: string
+          example: 2022-01-01T00:00:00.000Z
+
+    Folder:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        orgId:
+          type: integer
+          example: 1
+        createdBy:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Acme Corp
+        parentFolderId:
+          type: integer
+          example: null
+        createdAt:
+          type: string
+          example: 2022-01-01T00:00:00.000Z
+        deletedAt:
+          type: string
+          example: null
+        isRoot:
+          type: boolean
+          example: true
+
+    Document:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        folderId:
+          type: integer
+          example: 1
+        orgId:
+          type: integer
+          example: 1
+        currentVersionId:
+          type: integer
+          example: 1
+        createdBy:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Acme Corp
+        createdAt:
+          type: string
+          example: 2022-01-01T00:00:00.000Z
+        deletedAt:
+          type: string
+          example: null
+
+    ApiResponse:
+      type: object
+      properties:
+        statusCode:
+          type: integer
+          example: 200
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: Success
+        data:
+          type: object
+    ApiError:
+      type: object
+      properties:
+        statusCode:
+          type: integer
+          example: 400
+        success:
+          type: boolean
+          example: false
+        message:
+          type: string
+          example: Something went wrong
+        errors:
+          type: array
