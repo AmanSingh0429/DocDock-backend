@@ -8,25 +8,17 @@ const options = {
       version: "1.0.0",
       description: "Document Management System API",
     },
-
     servers: [
       {
         url: "http://localhost:5000/api/v1",
       },
     ],
 
-    components: {
-      securitySchemes: {
-        BearerAuth: {
-          type: "http",
-          scheme: "bearer",
-          bearerFormat: "JWT",
-        },
-      },
-    },
   },
 
-  apis: ["./src/routes/**/*.js", "./docs/api/**/*.js"]
+  apis: [
+    "./docs/api/**/*.yaml",
+  ],
 };
 
 export const swaggerSpec = swaggerJSDoc(options);
