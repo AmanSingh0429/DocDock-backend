@@ -1,0 +1,657 @@
+/orgs:
+  post:
+    summary: Create organization
+    description: |
+      Creates a new organization.
+
+      **Authentication:** Required
+
+      **Permissions:** NONE
+    tags:
+      - Organizations
+    security:
+      - BearerAuth: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - orgName
+              - createdByID
+            properties:
+              orgName:
+                type: string
+                example: Acme Corp
+              createdByID:
+                type: integer
+                example: 1
+
+    responses:
+      200:
+        description: Organization created successfully
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "#/components/schemas/ApiResponse"
+                - type: object
+                  properties:
+                    data:
+                      $ref: "#/components/schemas/Organization"
+            example:
+              statusCode: 200
+              success: true
+              message: Org created successfully
+              data:
+                id: 1
+                name: Acme Corp
+                createdBy: 1
+                createdAt: "2022-01-01T00:00:00.000Z"
+
+      400:
+        description: Bad Request
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApiError"
+            example:
+              statusCode: 400
+              success: false
+              message: Org name & creator is required
+              errors: []
+      401:
+        $ref: "#/components/responses/UnauthorizedError"
+
+      500:
+        description: Server Error
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApiError"
+            examples:
+              SEEDING_ERROR:
+                summary: Database seeding error
+                value:
+                  statusCode: 500
+                  success: false
+                  message: OWNER role not seeded
+                  errors: []
+              SERVER_ERROR:
+                summary: Internal Server Error
+                value:
+                  statusCode: 500
+                  success: false
+                  message: Failed to create org
+                  errors: []
+
+/orgs/{orgId}:
+  get:
+    summary: Get root org resorces
+    description: |
+      Retrieves the root resources for an organization.
+
+      **Authentication:** Required
+
+      **Permissions:** `folder.read` on the organization's root folder.
+
+    tags:
+      - Organizations
+    security:
+      - BearerAuth: []
+    parameters:
+      - in: path
+        name: orgId
+        required: true
+        schema:
+          type: integer
+        description: Organization ID
+        example: 1
+    responses:
+      200:
+        description: Organization resources retrieved successfully
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "#/components/schemas/ApiResponse"
+                - type: object
+                  properties:
+                    folders:
+                      type: array
+                      items:
+                        $ref: "#/components/schemas/Folder"
+                    docs:
+                      type: array
+                      items:
+                        $ref: "#/components/schemas/Document"
+            example:
+              statusCode: 200
+              success: true
+              message: Fetched resources successfully
+              data:
+                folders:
+                  - id: 1
+                    orgId: 1
+                    createdBy: 1
+                    name: Acme Corp
+                    parentFolderId: null
+                    createdAt: "2022-01-01T00:00:00.000Z"
+                    deletedAt: null
+                    isRoot: true
+                docs:
+                  - id: 1
+                    folderId: 1
+                    orgId: 1
+                    currentVersionId: 1
+                    createdBy: 1
+                    name: Acme Corp
+                    createdAt: "2022-01-01T00:00:00.000Z"
+                    deletedAt: null
+
+      400:
+        description: Bad Request
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApiError"
+            examples:
+              MISSING_ORG_ID:
+                summary: Missing Org ID
+                value:
+                  statusCode: 400
+                  success: false
+                  message: Org ID is required
+                  errors: []
+
+              INVALID_ORG_ID:
+                summary: Invalid Org ID
+                value:
+                  statusCode: 400
+                  success: false
+                  message: Invalid Org ID
+                  errors: []
+
+      401:
+        $ref: "#/components/responses/UnauthorizedError"
+
+      403:
+        $ref: "#/components/responses/ForbiddenError"
+
+      500:
+        $ref: "#/components/responses/InternalServerError"
+
+  patch:
+    summary: Rename organization
+    description: |
+      Updates the name of an existing organization.
+
+      **Authentication:** Required
+
+      **Permissions:** `org.update`
+
+    tags:
+      - Organizations
+
+    security:
+      - BearerAuth: []
+
+    parameters:
+      - in: path
+        name: orgId
+        required: true
+        schema:
+          type: integer
+        description: Organization ID
+        example: 1
+
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - newOrgName
+            properties:
+              newOrgName:
+                type: string
+                example: Acme Corporation
+
+    responses:
+      200:
+        description: Organization created successfully
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "#/components/schemas/ApiResponse"
+                - type: object
+                  properties:
+                    data:
+                      $ref: "#/components/schemas/Organization"
+            example:
+              statusCode: 200
+              success: true
+              message: Org renamed successfully
+              data:
+                id: 1
+                name: Acme Corp
+                createdBy: 1
+                createdAt: "2022-01-01T00:00:00.000Z"
+
+      400:
+        description: Bad Request
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApiError"
+            examples:
+              MISSING_ORG_ID:
+                summary: Missing Org ID
+                value:
+                  statusCode: 400
+                  success: false
+                  message: Org ID is required
+                  errors: []
+
+              NO_ORG_NAME:
+                summary: Empty Org Name
+                value:
+                  statusCode: 400
+                  success: false
+                  message: Org name cannot be empty
+                  errors: []
+
+              REPEATED_ORG_NAME:
+                summary: Repeated Org Name
+                value:
+                  statusCode: 400
+                  success: false
+                  message: New name can not be the same as previous name
+                  errors: []
+
+      401:
+        $ref: "#/components/responses/UnauthorizedError"
+
+      403:
+        $ref: "#/components/responses/ForbiddenError"
+
+      404:
+        description: Not Found
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApiError"
+            example:
+              statusCode: 404
+              success: false
+              message: Org not found
+              errors: []
+
+      500:
+        $ref: "#/components/responses/InternalServerError"
+
+/orgs/{orgId}/leave:
+  delete:
+    summary: Leave organization
+    description: |
+      Lets a member leave an organization.
+
+      **Authentication:** Required
+
+      **Permissions:** NONE
+    tags:
+      - Organizations
+    security:
+      - BearerAuth: []
+    parameters:
+      - in: path
+        name: orgId
+        required: true
+        schema:
+          type: integer
+        description: Organization ID
+        example: 1
+    responses:
+      200:
+        description: Organization left successfully
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "#/components/schemas/ApiResponse"
+                - type: object
+                  properties:
+                    data:
+                      type: object
+                      properties:
+                        userId:
+                          type: integer
+                        orgId:
+                          type: integer
+                        joinedAt:
+                          type: string
+            example:
+              statusCode: 200
+              success: true
+              message: Org left
+              data:
+                userId: 1
+                orgId: 1
+                joinedAt: "2022-01-01T00:00:00.000Z"
+
+      400:
+        description: Bad Request
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApiError"
+            example:
+              summary: Last Owner Leaving
+              value:
+                statusCode: 400
+                success: false
+                message: Add a new owner before you leave the org
+                errors: []
+
+      401:
+        $ref: "#/components/responses/UnauthorizedError"
+
+      404:
+        description: Not Found
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApiError"
+            example:
+              statusCode: 404
+              success: false
+              message: User is not a member of this org
+              errors: []
+
+      500:
+        $ref: "#/components/responses/InternalServerError"
+
+/orgs/{orgId}/role:
+  post:
+    summary: Assign Roles
+    description: |
+      Assigns roles to a user in an organization.
+
+      **Authentication:** Required
+
+      **Permissions:** `org.user.update_role`
+    tags:
+      - Organizations
+    security:
+      - BearerAuth: []
+    parameters:
+      - in: path
+        name: orgId
+        required: true
+        schema:
+          type: integer
+        description: Organization ID
+        example: 1
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - targetUserId
+              - role
+            properties:
+              targetUserId:
+                type: integer
+                example: 1
+              role:
+                type: string
+                example: EDITOR
+    responses:
+      200:
+        description: Role assigned successfully
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "#/components/schemas/ApiResponse"
+                - type: object
+                  properties:
+                    data:
+                      type: object
+                      properties:
+                        userId:
+                          type: integer
+                        orgId:
+                          type: integer
+                        roleId:
+                          type: integer
+            example:
+              statusCode: 200
+              success: true
+              message: Role assigned successfully
+              data:
+                userId: 1
+                orgId: 1
+                roleId: 1
+
+      401:
+        $ref: "#/components/responses/UnauthorizedError"
+
+      400:
+        description: Bad Request
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApiError"
+            examples:
+              MISSING_ROLE_NAME:
+                summary: Missing Role Name
+                value:
+                  statusCode: 400
+                  success: false
+                  message: Role name is required
+                  errors: []
+
+              NO_ORG_NAME:
+                summary: Empty Org Name
+                value:
+                  statusCode: 400
+                  success: false
+                  message: User already has this role
+                  errors: []
+
+      403:
+        description: Not Found
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApiError"
+            examples:
+              MODIFIER_NOT_OWNER:
+                summary: Modifier is not an owner
+                value:
+                  statusCode: 403
+                  success: false
+                  message: Only owners can assign OWNER role
+                  errors: []
+
+              INSUFFICIENT_PERMISSIONS:
+                summary: Insufficient permissions
+                value:
+                  statusCode: 403
+                  success: false
+                  message: You do not have permission to perform this action
+                  errors: []
+
+      404:
+        description: Not Found
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApiError"
+            examples:
+              MISSING_MODIFIER:
+                summary: Missing Modifier User
+                value:
+                  statusCode: 404
+                  success: false
+                  message: Modifier user not found
+                  errors: []
+
+              MISSING_TARGET:
+                summary: Missing Target User
+                value:
+                  statusCode: 404
+                  success: false
+                  message: User not found
+                  errors: []
+
+              MISSING_ROLE:
+                summary: Role not found
+                value:
+                  statusCode: 404
+                  success: false
+                  message: Role not found
+                  errors: []
+
+      500:
+        $ref: "#/components/responses/InternalServerError"
+
+/orgs/{orgId}/remove:
+  delete:
+    summary: Remove User
+    description: |
+      Removes a user from an organization by deleting their membership along with role.
+
+      **Authentication:** Required
+
+      **Permissions:** `org.user.update_role`
+    tags:
+      - Organizations
+    security:
+      - BearerAuth: []
+    parameters:
+      - in: path
+        name: orgId
+        required: true
+        schema:
+          type: integer
+        description: Organization ID
+        example: 1
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - targetUserId
+            properties:
+              targetUserId:
+                type: integer
+                example: 1
+      responses:
+        200:
+          description: User removed successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/ApiResponse"
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          userId:
+                            type: integer
+                          orgId:
+                            type: integer
+                          joinedAt:
+                            type: string
+              example:
+                statusCode: 200
+                success: true
+                message: User removed successfully
+                data:
+                  userId: 1
+                  orgId: 1
+                  joinedAt: "2022-01-01T00:00:00.000Z"
+      400:
+        description: Bad Request
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApiError"
+            example:
+              summary: Missing Target User
+              value:
+                statusCode: 400
+                success: false
+                message: Target user ID is required
+                errors: []
+
+      401:
+        $ref: "#/components/responses/UnauthorizedError"
+
+      403:
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApiError"
+            examples:
+              MODIFIER_NOT_OWNER:
+                summary: Modifier is not an owner
+                value:
+                  statusCode: 403
+                  success: false
+                  message: Only owner can remove owner
+                  errors: []
+
+              LAST_OWNER:
+                summary: Target is the last owner
+                value:
+                  statusCode: 403
+                  success: false
+                  message: Cannot remove last owner
+                  errors: []
+
+              INSUFFICIENT_PERMISSIONS:
+                summary: Insufficient permissions
+                value:
+                  statusCode: 403
+                  success: false
+                  message: You do not have permission to perform this action
+                  errors: []
+
+      404:
+        description: Not Found
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApiError"
+            examples:
+              MISSING_MODIFIER:
+                summary: Missing Modifier User
+                value:
+                  statusCode: 404
+                  success: false
+                  message: Modifier user not found
+                  errors: []
+
+              MISSING_TARGET:
+                summary: Missing Target User
+                value:
+                  statusCode: 404
+                  success: false
+                  message: User not found
+                  errors: []
+
+      500:
+        $ref: "#/components/responses/InternalServerError"
