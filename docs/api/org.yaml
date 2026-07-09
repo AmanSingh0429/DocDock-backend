@@ -118,14 +118,17 @@
                 - $ref: "#/components/schemas/ApiResponse"
                 - type: object
                   properties:
-                    folders:
-                      type: array
-                      items:
-                        $ref: "#/components/schemas/Folder"
-                    docs:
-                      type: array
-                      items:
-                        $ref: "#/components/schemas/Document"
+                    data:
+                      type: object
+                      properties:
+                        docs:
+                          type: array
+                          items:
+                            $ref: "#/components/schemas/Document"
+                        folders:
+                          type: array
+                          items:
+                            $ref: "#/components/schemas/Folder"
             example:
               statusCode: 200
               success: true
