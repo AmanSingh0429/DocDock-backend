@@ -1,0 +1,885 @@
+/orgs/{orgId}/docs/{docId}:
+  get:
+    summary: Get document
+    description: |
+      Retrieves a document from an organization.
+
+      **Authentication:** Required
+
+      **Permissions:** `document.read`.
+    tags:
+      - Documents
+    security:
+      - BearerAuth: []
+    parameters:
+      - in: path
+        name: orgId
+        required: true
+        schema:
+          type: integer
+        description: Organization ID
+        example: 1
+      - in: path
+        name: docId
+        required: true
+        schema:
+          type: integer
+        description: Document ID
+        example: 1
+    responses:
+      200:
+        description: Document retrieved successfully
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "#/components/schemas/ApiResponse"
+                - type: object
+                  properties:
+                    data:
+                      $ref: "#/components/schemas/Document"
+            example:
+              statusCode: 200
+              success: true
+              message: Document fetched successfully
+              data:
+                id: 1
+                folderId: 1
+                orgId: 1
+                currentVersionId: 1
+                createdBy: 1
+                name: Acme Corp
+                createdAt: "2022-01-01T00:00:00.000Z"
+                deletedAt: null
+      401:
+        $ref: "#/components/responses/UnauthorizedError"
+
+      403:
+        $ref: "#/components/responses/ForbiddenError"
+
+      404:
+        description: Not Found
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApiError"
+            example:
+              statusCode: 404
+              success: false
+              message: The requested document not found
+              errors: []
+      500:
+        $ref: "#/components/responses/InternalServerError"
+
+  patch:
+    summary: Rename document
+    description: |
+      Renames a existing document in an organization.
+
+      **Authentication:** Required
+
+      **Permissions:** `document.rename` on document
+    tags:
+      - Documents
+    security:
+      - BearerAuth: []
+    parameters:
+      - in: path
+        name: orgId
+        required: true
+        schema:
+          type: integer
+        description: Organization ID
+        example: 1
+      - in: path
+        name: docId
+        required: true
+        schema:
+          type: integer
+        description: Document ID
+        example: 1
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - newDocName
+            properties:
+              newDocName:
+                type: string
+                example: Acme Corp
+    responses:
+      200:
+        description: Document retrieved successfully
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "#/components/schemas/ApiResponse"
+                - type: object
+                  properties:
+                    data:
+                      $ref: "#/components/schemas/Document"
+            example:
+              statusCode: 200
+              success: true
+              message: Document fetched successfully
+              data:
+                id: 1
+                folderId: 1
+                orgId: 1
+                currentVersionId: 1
+                createdBy: 1
+                name: Acme Corp
+                createdAt: "2022-01-01T00:00:00.000Z"
+                deletedAt: null
+
+      400:
+        description: Bad Request
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApiError"
+            examples:
+              MISSING_DOC_NAME:
+                summary: Missing Document Name
+                value:
+                  statusCode: 400
+                  success: false
+                  message: Document name is required
+                  errors: []
+
+              REPEATED_DOC_NAME:
+                summary: Repeated Document Name
+                value:
+                  statusCode: 400
+                  success: false
+                  message: New name must be different from current name
+                  errors: []
+
+      401:
+        $ref: "#/components/responses/UnauthorizedError"
+
+      403:
+        $ref: "#/components/responses/ForbiddenError"
+
+      404:
+        description: Not Found
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApiError"
+            example:
+              statusCode: 404
+              success: false
+              message: Document not found
+              errors: []
+      409:
+        description: Conflict
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApiError"
+            example:
+              statusCode: 409
+              success: false
+              message: Document with same name already exists
+              errors: []
+
+      500:
+        $ref: "#/components/responses/InternalServerError"
+
+  delete:
+    summary: Delete document
+    description: |
+      Soft Deletes a existing document in an organization.
+
+      **Authentication:** Required
+
+      **Permissions:** `document.delete` on document
+    tags:
+      - Documents
+    security:
+      - BearerAuth: []
+    parameters:
+      - in: path
+        name: orgId
+        required: true
+        schema:
+          type: integer
+        description: Organization ID
+        example: 1
+      - in: path
+        name: docId
+        required: true
+        schema:
+          type: integer
+        description: Document ID
+        example: 1
+    responses:
+      200:
+        description: Document deleted successfully
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "#/components/schemas/ApiResponse"
+                - type: object
+                  properties:
+                    data:
+                      $ref: "#/components/schemas/Document"
+            example:
+              statusCode: 200
+              success: true
+              message: Document deleted
+              data:
+                id: 1
+                folderId: 1
+                orgId: 1
+                currentVersionId: 1
+                createdBy: 1
+                name: Acme Corp
+                createdAt: "2022-01-01T00:00:00.000Z"
+                deletedAt: "2022-01-01T00:00:00.000Z"
+
+      401:
+        $ref: "#/components/responses/UnauthorizedError"
+
+      403:
+        $ref: "#/components/responses/ForbiddenError"
+
+      404:
+        description: Not Found
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApiError"
+            example:
+              statusCode: 404
+              success: false
+              message: Document not found or already deleted
+              errors: []
+
+      500:
+        $ref: "#/components/responses/InternalServerError"
+
+/orgs/{orgId}/docs/:
+  post:
+    summary: Create document
+    description: |
+      Creates a new document in an organization.
+
+      **Authentication:** Required
+
+      **Permissions:** `document.create` on location folder
+    tags:
+      - Documents
+    security:
+      - BearerAuth: []
+    parameters:
+      - in: path
+        name: orgId
+        required: true
+        schema:
+          type: integer
+        description: Organization ID
+        example: 1
+    requestBody:
+      required: true
+      content:
+        multipart/form-data:
+          schema:
+            type: object
+            required:
+              - docName
+              - folderId
+              - file
+            properties:
+              docName:
+                type: string
+                example: Acme Corp
+              folderId:
+                type: integer
+                example: 1
+              file:
+                type: string
+                format: binary
+                description: Document file to upload
+    responses:
+      200:
+        description: Document created successfully
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "#/components/schemas/ApiResponse"
+                - type: object
+                  properties:
+                    data:
+                      $ref: "#/components/schemas/Document"
+            example:
+              statusCode: 200
+              success: true
+              message: Document created
+              data:
+                id: 1
+                folderId: 1
+                orgId: 1
+                currentVersionId: 1
+                createdBy: 1
+                name: Acme Corp
+                createdAt: "2022-01-01T00:00:00.000Z"
+                deletedAt: null
+
+      400:
+        description: Bad Request
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApiError"
+            examples:
+              MISSING_DOC_DETAILS:
+                summary: Missing Document Details
+                value:
+                  statusCode: 400
+                  success: false
+                  message: Document name & file is required
+                  errors: []
+
+              INVALID_FILE:
+                summary: Invalid File
+                value:
+                  statusCode: 400
+                  success: false
+                  message: Invalid file upload
+                  errors: []
+
+      401:
+        $ref: "#/components/responses/UnauthorizedError"
+
+      403:
+        $ref: "#/components/responses/ForbiddenError"
+
+      404:
+        description: Not Found
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApiError"
+            example:
+              statusCode: 404
+              success: false
+              message: Parent folder not found
+              errors: []
+
+      409:
+        description: Conflict
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApiError"
+            example:
+              statusCode: 404
+              success: false
+              message: Document with same name already exists
+              errors: []
+
+      500:
+        description: Internal Server Error
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApiError"
+            examples:
+              MISSING_ROOT_FOLDER:
+                summary: Org has no root folder
+                value:
+                  statusCode: 500
+                  success: false
+                  message: Root folder not found
+                  errors: []
+
+              SERVER_ERROR:
+                summary: Internal Server Error
+                value:
+                  statusCode: 500
+                  success: false
+                  message: Internal Server Error
+                  errors: []
+
+/orgs/{orgId}/docs/{docId}/versions:
+  patch:
+    summary: Update document
+    description: |
+      Update a existing documents version.
+
+      **Authentication:** Required
+
+      **Permissions:** `document.update` on document
+    tags:
+      - Documents
+    security:
+      - BearerAuth: []
+    parameters:
+      - in: path
+        name: orgId
+        required: true
+        schema:
+          type: integer
+        description: Organization ID
+        example: 1
+      - in: path
+        name: docId
+        required: true
+        schema:
+          type: integer
+        description: Document ID
+        example: 1
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - file
+            properties:
+              file:
+                type: string
+                format: binary
+                description: Document file to upload
+
+    responses:
+      200:
+        description: Document update successfully
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "#/components/schemas/ApiResponse"
+                - type: object
+                  properties:
+                    data:
+                      $ref: "#/components/schemas/Document"
+            example:
+              statusCode: 200
+              success: true
+              message: Document created
+              data:
+                id: 1
+                folderId: 1
+                orgId: 1
+                currentVersionId: 1
+                createdBy: 1
+                name: Acme Corp
+                createdAt: "2022-01-01T00:00:00.000Z"
+                deletedAt: null
+
+      400:
+        description: Bad Request
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApiError"
+            examples:
+              MISSING_DOC_DETAILS:
+                summary: Missing Document Details
+                value:
+                  statusCode: 400
+                  success: false
+                  message: Document name & file is required
+                  errors: []
+
+              INVALID_FILE:
+                summary: Invalid File
+                value:
+                  statusCode: 400
+                  success: false
+                  message: Invalid file upload
+                  errors: []
+
+      401:
+        $ref: "#/components/responses/UnauthorizedError"
+
+      403:
+        $ref: "#/components/responses/ForbiddenError"
+
+      404:
+        description: Not Found
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApiError"
+            example:
+              statusCode: 404
+              success: false
+              message: Document not found
+              errors: []
+
+      409:
+        description: Conflict
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApiError"
+            example:
+              statusCode: 404
+              success: false
+              message: Document with same name already exists
+              errors: []
+
+      500:
+        $ref: "#/components/responses/InternalServerError"
+
+  get:
+    summary: Get document versions
+    description: |
+      Retrieves a document version for a document.
+
+      **Authentication:** Required
+
+      **Permissions:** `document.read` on document
+    tags:
+      - Documents
+    security:
+      - BearerAuth: []
+    parameters:
+      - in: path
+        name: orgId
+        required: true
+        schema:
+          type: integer
+        description: Organization ID
+        example: 1
+      - in: path
+        name: docId
+        required: true
+        schema:
+          type: integer
+        description: Document ID
+        example: 1
+    responses:
+      200:
+        description: Fetched documnet versions
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "#/components/schemas/ApiResponse"
+                - type: object
+                  properties:
+                    data:
+                      allOf:
+                        - $ref: "#/components/schemas/Document"
+                        - type: object
+                          properties:
+                            versions:
+                              type: array
+                              items:
+                                $ref: "#/components/schemas/DocumentVersion"
+            example:
+              statusCode: 200
+              success: true
+              message: Fetched documnet versions
+              data:
+                id: 1
+                folderId: 1
+                orgId: 1
+                currentVersionId: 1
+                createdBy: 1
+                name: Acme Corp
+                createdAt: "2022-01-01T00:00:00.000Z"
+                deletedAt: null
+                versions:
+                  - id: 1
+                    docId: 1
+                    fileUrl: "https://example.com/file.pdf"
+                    fileHash: "2b$10$R9lV2VXxN4bG5v1Z8eT2N6B6B6B6B6B6B6B6B6B6B6B6B6B6"
+                    versionNumber: 1
+                    uploadedBy: 1
+                    createdAt: "2022-01-02T00:00:00.000Z"
+                    publicId: "ABC123"
+                    bytes: 1024
+
+      401:
+        $ref: "#/components/responses/UnauthorizedError"
+
+      403:
+        $ref: "#/components/responses/ForbiddenError"
+
+      404:
+        description: Not Found
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApiError"
+            example:
+              statusCode: 404
+              success: false
+              message: Document not found
+              errors: []
+
+      500:
+        $ref: "#/components/responses/InternalServerError"
+
+/orgs/{orgId}/docs/{docId}/move:
+  post:
+    summary: Move document
+    description: |
+      Moves a document to another folder within the organization.
+
+      **Authentication:** Required
+
+      **Permissions:** `document.move` on document & `document.create` on destination folder
+    tags:
+      - Documents
+    security:
+      - BearerAuth: []
+    parameters:
+      - in: path
+        name: orgId
+        required: true
+        schema:
+          type: integer
+        description: Organization ID
+        example: 1
+      - in: path
+        name: docId
+        required: true
+        schema:
+          type: integer
+        description: Document ID
+        example: 1
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - destinationFolderId
+            properties:
+              destinationFolderId:
+                type: integer
+                example: 1
+    responses:
+      200:
+        description: Document moved successfully
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "#/components/schemas/ApiResponse"
+                - type: object
+                  properties:
+                    data:
+                      $ref: "#/components/schemas/Document"
+            example:
+              statusCode: 200
+              success: true
+              message: Document moved successfully
+              data:
+                id: 1
+                folderId: 1
+                orgId: 1
+                currentVersionId: 1
+                createdBy: 1
+                name: Acme Corp
+                createdAt: "2022-01-01T00:00:00.000Z"
+                deletedAt: null
+
+      400:
+        description: Bad Request
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApiError"
+            examples:
+              INVALID_MOVE:
+                summary: Document at destination folder
+                value:
+                  statusCode: 400
+                  success: false
+                  message: Document is already in this location
+                  errors: []
+
+              INVALID_FILE:
+                summary: Invalid File
+                value:
+                  statusCode: 400
+                  success: false
+                  message: Invalid file upload
+                  errors: []
+      401:
+        $ref: "#/components/responses/UnauthorizedError"
+
+      403:
+        $ref: "#/components/responses/ForbiddenError"
+
+      404:
+        description: Not Found
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApiError"
+            examples:
+              MISSING_DOC:
+                summary: Document not found
+                value:
+                  statusCode: 404
+                  success: false
+                  message: Document not found
+                  errors: []
+
+              MISSING_FOLDER:
+                summary: Folder not found
+                value:
+                  statusCode: 404
+                  success: false
+                  message: Destination folder not found
+                  errors: []
+
+      409:
+        description: Conflict
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApiError"
+            example:
+              statusCode: 404
+              success: false
+              message: Document with same name already exists in the destination folder
+              errors: []
+
+      500:
+        $ref: "#/components/responses/InternalServerError"
+
+/orgs/{orgId}/docs/{docId}/restore:
+  post:
+    summary: Restore document
+    description: |
+      Restores a soft deleted document.
+
+      **Authentication:** Required
+
+      **Permissions:** `document.restore` on document
+    tags:
+      - Documents
+    security:
+      - BearerAuth: []
+    parameters:
+      - in: path
+        name: orgId
+        required: true
+        schema:
+          type: integer
+        description: Organization ID
+        example: 1
+      - in: path
+        name: docId
+        required: true
+        schema:
+          type: integer
+        description: Document ID
+        example: 1
+    responses:
+      200:
+        description: Document restored successfully
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "#/components/schemas/ApiResponse"
+                - type: object
+                  properties:
+                    data:
+                      $ref: "#/components/schemas/Document"
+            example:
+              statusCode: 200
+              success: true
+              message: Document restored
+              data:
+                id: 1
+                folderId: 1
+                orgId: 1
+                currentVersionId: 1
+                createdBy: 1
+                name: Acme Corp
+                createdAt: "2022-01-01T00:00:00.000Z"
+                deletedAt: null
+
+      400:
+        description: Bad Request
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApiError"
+            example:
+              statusCode: 400
+              success: false
+              message: Document is not deleted
+              errors: []
+
+      401:
+        $ref: "#/components/responses/UnauthorizedError"
+
+      403:
+        $ref: "#/components/responses/ForbiddenError"
+
+      404:
+        description: Not found
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApiError"
+            examples:
+              MISSING_DOC:
+                summary: Document not found
+                value:
+                  statusCode: 404
+                  success: false
+                  message: Document not found
+                  errors: []
+              MISSING_FOLDER:
+                summary: Folder not found
+                value:
+                  statusCode: 404
+                  success: false
+                  message: Target folder not found
+                  errors: []
+      409:
+        description: Conflict
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApiError"
+            example:
+              statusCode: 409
+              success: false
+              message: Document with same name exists at the restore location
+              errors: []
+
+      500:
+        description: Internal Server Error
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApiError"
+            examples:
+              MISSING_ROOT_FOLDER:
+                summary: Org has no root folder
+                value:
+                  statusCode: 500
+                  success: false
+                  message: Root folder not found
+                  errors: []
+
+              SERVER_ERROR:
+                summary: Internal Server Error
+                value:
+                  statusCode: 500
+                  success: false
+                  message: Internal Server Error
+                  errors: []

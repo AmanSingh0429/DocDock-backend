@@ -94,6 +94,37 @@ components:
           type: string
           example: null
 
+    DocumentVersion:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        docId:
+          type: integer
+          example: 1
+        fileUrl:
+          type: string
+          example: https://example.com/file.pdf
+        fileHash:
+          type: string
+          example: $2b$10$R9lV2VXxN4bG5v1Z8eT2N6B6B6B6B6B6B6B6B6B6B6B6B6B6
+        versionNumber:
+          type: integer
+          example: 1
+        uploadedBy:
+          type: integer
+          example: 1
+        createdAt:
+          type: string
+          example: 2022-01-01T00:00:00.000Z
+        publicId:
+          type: string
+          example: "ABC123"
+        bytes:
+          type: integer
+          example: 1024
+
     ApiResponse:
       type: object
       properties:
