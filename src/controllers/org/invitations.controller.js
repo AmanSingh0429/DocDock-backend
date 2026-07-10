@@ -25,7 +25,7 @@ export const revokeOrgInvitation = async (req, res) => {
 
   const result = await revokeInvitationService(token, userId)
 
-  return res.json(new ApiResponse(200, "Invite Accepted", result, true))
+  return res.json(new ApiResponse(200, "Invite Revoked", result, true))
 }
 
 export const listOrgInvitations = async (req, res) => {
@@ -33,10 +33,7 @@ export const listOrgInvitations = async (req, res) => {
 
   const invitations = await listOrgInvitationsService(Number(orgId));
 
-  res.status(200).json({
-    success: true,
-    data: invitations
-  });
+  res.json(new ApiResponse(200, "Invitations fetched successfully", invitations));
 };
 
 export const getInvitationByToken = async (req, res) => {
@@ -44,8 +41,5 @@ export const getInvitationByToken = async (req, res) => {
 
   const data = await getInvitationByTokenService(token);
 
-  res.status(200).json({
-    success: true,
-    data
-  });
+  res.json(new ApiResponse(200, "Invitation fetched successfully", data));
 };
