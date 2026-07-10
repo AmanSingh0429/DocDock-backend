@@ -1,0 +1,699 @@
+/orgs/{orgId}/folders/{folderId}:
+  get:
+    summary: Get Folders Contents
+    description: |
+      Retrieves a folders content in a organization.
+
+      **Authentication:** Required
+
+      **Permissions:** `folder.read` on folder
+    tags:
+      - Folders
+    security:
+      - BearerAuth: []
+    parameters:
+      - in: path
+        name: orgId
+        required: true
+        schema:
+          type: integer
+        description: Organization ID
+        example: 1
+      - in: path
+        name: folderId
+        required: true
+        schema:
+          type: integer
+        description: Folder ID
+        example: 1
+    responses:
+      200:
+        description: Folder
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "#/components/schemas/ApiResponse"
+                - type: object
+                  properties:
+                    data:
+                      type: object
+                      properties:
+                        docs:
+                          type: array
+                          items:
+                            $ref: "#/components/schemas/Document"
+                        folders:
+                          type: array
+                          items:
+                            $ref: "#/components/schemas/Folder"
+            example:
+              statusCode: 200
+              success: true
+              message: Fetched resources successfully
+              data:
+                folders:
+                  - id: 1
+                    orgId: 1
+                    createdBy: 1
+                    name: Acme Corp
+                    parentFolderId: null
+                    createdAt: "2022-01-01T00:00:00.000Z"
+                    deletedAt: null
+                    isRoot: false
+                docs:
+                  - id: 1
+                    folderId: 1
+                    orgId: 1
+                    currentVersionId: 1
+                    createdBy: 1
+                    name: Acme Corp
+                    createdAt: "2022-01-01T00:00:00.000Z"
+                    deletedAt: null
+
+      401:
+        $ref: "#/components/responses/UnauthorizedError"
+
+      403:
+        $ref: "#/components/responses/ForbiddenError"
+
+      404:
+        description: Not Found
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApiError"
+            example:
+              statusCode: 404
+              success: false
+              message: Folder not found
+              errors: []
+
+      500:
+        $ref: "#/components/responses/InternalServerError"
+
+  patch:
+    summary: Rename Folder
+    description: |
+      Renames a folder in a organization.
+
+      **Authentication:** Required
+
+      **Permissions:** `folder.rename` on folder
+    tags:
+      - Folders
+    security:
+      - BearerAuth: []
+    parameters:
+      - in: path
+        name: orgId
+        required: true
+        schema:
+          type: integer
+        description: Organization ID
+        example: 1
+      - in: path
+        name: folderId
+        required: true
+        schema:
+          type: integer
+        description: Folder ID
+        example: 1
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - newFolderName
+            properties:
+              newFolderName:
+                type: string
+                example: Acme Corp
+
+    responses:
+      200:
+        description: Folder Renamed Successfully
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "#/components/schemas/ApiResponse"
+                - type: object
+                  properties:
+                    data:
+                      $ref: "#/components/schemas/Folder"
+            example:
+              statusCode: 200
+              success: true
+              message: Folder created
+              data:
+                id: 1
+                orgId: 1
+                createdBy: 1
+                name: Acme Corp
+                parentFolderId: null
+                createdAt: "2022-01-01T00:00:00.000Z"
+                deletedAt: null
+                isRoot: false
+
+      400:
+        description: Bad Request
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApiError"
+            examples:
+              INVALID_FOLDER_NAME:
+                summary: Invalid Folder Name
+                value:
+                  statusCode: 400
+                  success: false
+                  message: New folder name is required
+                  errors: []
+
+              FOLDER_IS_ROOT:
+                summary: Folder is root
+                value:
+                  statusCode: 400
+                  success: false
+                  message: Invalid operation
+                  errors: []
+
+              REPEATED_FOLDER_NAME:
+                summary: Repeated Folder Name
+                value:
+                  statusCode: 400
+                  success: false
+                  message: New name must be different
+                  errors: []
+
+      401:
+        $ref: "#/components/responses/UnauthorizedError"
+
+      403:
+        $ref: "#/components/responses/ForbiddenError"
+
+      404:
+        description: Not Found
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApiError"
+            example:
+              statusCode: 404
+              success: false
+              message: Folder does not exist
+              errors: []
+
+      409:
+        description: Conflict
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApiError"
+            example:
+              statusCode: 409
+              success: false
+              message: Folder with same name already exists
+              errors: []
+
+      500:
+        $ref: "#/components/responses/InternalServerError"
+
+  delete:
+    summary: Delete Folder
+    description: |
+      Soft deletes a folder in a organization.
+
+      **Authentication:** Required
+
+      **Permissions:** `folder.delete` on folder
+    tags:
+      - Folders
+    security:
+      - BearerAuth: []
+    parameters:
+      - in: path
+        name: orgId
+        required: true
+        schema:
+          type: integer
+        description: Organization ID
+        example: 1
+      - in: path
+        name: folderId
+        required: true
+        schema:
+          type: integer
+        description: Folder ID
+        example: 1
+    responses:
+      200:
+        description: Folder Deleted Successfully
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "#/components/schemas/ApiResponse"
+                - type: object
+                  properties:
+                    data:
+                      type: object
+                      properties:
+                        existingFolder:
+                          $ref: "#/components/schemas/Folder"
+                        transactionResult:
+                          type: object
+                          properties:
+                            updatedFolders:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  id:
+                                    type: integer
+                            updatedDocs:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  id:
+                                    type: integer
+            example:
+              statusCode: 200
+              success: true
+              message: Folder deleted
+              data:
+                existingFolder:
+                  id: 1
+                  orgId: 1
+                  createdBy: 1
+                  name: Acme Corp
+                  parentFolderId: null
+                  createdAt: "2022-01-01T00:00:00.000Z"
+                  deletedAt: "2022-01-01T00:00:00.000Z"
+                  isRoot: false
+                transactionResult:
+                  updatedFolders:
+                    - id: 1
+                  updatedDocs:
+                    - id: 1
+
+      400:
+        description: Bad Request (Delete root folder)
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApiError"
+            example:
+              statusCode: 400
+              success: false
+              message: Invalid operation
+              errors: []
+
+      401:
+        $ref: "#/components/responses/UnauthorizedError"
+
+      403:
+        $ref: "#/components/responses/ForbiddenError"
+
+      404:
+        description: Not Found
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApiError"
+            example:
+              statusCode: 404
+              success: false
+              message: Folder not found
+              errors: []
+
+      500:
+        $ref: "#/components/responses/InternalServerError"
+
+/orgs/{orgId}/folders/:
+  post:
+    summary: Create Folder
+    description: |
+      Creates a folder in a organization.
+
+      **Authentication:** Required
+
+      **Permissions:** `folder.create` on parent folder
+    tags:
+      - Folders
+    security:
+      - BearerAuth: []
+    parameters:
+      - in: path
+        name: orgId
+        required: true
+        schema:
+          type: integer
+        description: Organization ID
+        example: 1
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - folderName
+              - parentFolderId
+            properties:
+              folderName:
+                type: string
+                example: Acme Corp
+              parentFolderId:
+                type: integer
+                example: 1
+    responses:
+      200:
+        description: Folder Created Successfully
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "#/components/schemas/ApiResponse"
+                - type: object
+                  properties:
+                    data:
+                      $ref: "#/components/schemas/Folder"
+            example:
+              statusCode: 200
+              success: true
+              message: Folder created
+              data:
+                id: 1
+                orgId: 1
+                createdBy: 1
+                name: Acme Corp
+                parentFolderId: null
+                createdAt: "2022-01-01T00:00:00.000Z"
+                deletedAt: null
+                isRoot: false
+
+      400:
+        description: Bad Request
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApiError"
+            example:
+              statusCode: 400
+              success: false
+              message: Folder name is required
+              errors: []
+
+      401:
+        $ref: "#/components/responses/UnauthorizedError"
+
+      403:
+        $ref: "#/components/responses/ForbiddenError"
+
+      404:
+        description: Not Found
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApiError"
+            example:
+              statusCode: 404
+              success: false
+              message: Parent folder not found
+              errors: []
+
+      409:
+        description: Conflict
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApiError"
+            example:
+              statusCode: 409
+              success: false
+              message: Folder with same name already exists
+              errors: []
+
+      500:
+        $ref: "#/components/responses/InternalServerError"
+
+/orgs/{orgId}/folders/{folderId}/move:
+  patch:
+    summary: Move Folder
+    description: |
+      Moves a folder to another folder within the organization or to a root of the organization.
+
+      **Authentication:** Required
+
+      **Permissions:** `folder.move` on folder & `folder.create` on destination folder
+    tags:
+      - Folders
+    security:
+      - BearerAuth: []
+    parameters:
+      - in: path
+        name: orgId
+        required: true
+        schema:
+          type: integer
+        description: Organization ID
+        example: 1
+      - in: path
+        name: folderId
+        required: true
+        schema:
+          type: integer
+        description: Folder ID
+        example: 1
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - destinationFolderId
+            properties:
+              destinationFolderId:
+                type: integer
+                example: 1
+    responses:
+      200:
+        description: Folder Moved Successfully
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "#/components/schemas/ApiResponse"
+                - type: object
+                  properties:
+                    data:
+                      $ref: "#/components/schemas/Folder"
+            example:
+              statusCode: 200
+              success: true
+              message: Folder moved
+              data:
+                id: 1
+                orgId: 1
+                createdBy: 1
+                name: Acme Corp
+                parentFolderId: 1
+                createdAt: "2022-01-01T00:00:00.000Z"
+                deletedAt: null
+                isRoot: false
+
+      400:
+        description: Bad Request
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApiError"
+            examples:
+              MISSING_FOLDER_ID:
+                summary: Missing Folder Id
+                value:
+                  statusCode: 400
+                  success: false
+                  message: Folder id is required
+                  errors: []
+
+              MOVING_TO_DECENDANT:
+                summary: Moving to decendant
+                value:
+                  statusCode: 400
+                  success: false
+                  message: Cannot move folder into its descendant
+                  errors: []
+
+              FOLDER_IS_ROOT:
+                summary: Folder is root
+                value:
+                  statusCode: 400
+                  success: false
+                  message: Invalid operation
+                  errors: []
+
+              MOVE_FOLDER_TO_ITSELF:
+                summary: Move folder to itself
+                value:
+                  statusCode: 400
+                  success: false
+                  message: Folder cannot be moved to itself
+                  errors: []
+
+              FOLDER_AT_DESTINATION:
+                summary: Folder at destination
+                value:
+                  statusCode: 400
+                  success: false
+                  message: Folder already in this location
+                  errors: []
+
+      401:
+        $ref: "#/components/responses/UnauthorizedError"
+
+      403:
+        $ref: "#/components/responses/ForbiddenError"
+
+      404:
+        description: Not Found
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApiError"
+            examples:
+              MISSING_FOLDER:
+                summary: Missing Folder
+                value:
+                  statusCode: 404
+                  success: false
+                  message: Folder not found
+                  errors: []
+
+              MISSING_DESTINATION_FOLDER:
+                summary: Missing Destination Folder
+                value:
+                  statusCode: 404
+                  success: false
+                  message: Destination folder not found
+                  errors: []
+
+      409:
+        description: Conflict
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApiError"
+            example:
+              statusCode: 409
+              success: false
+              message: Folder with same name already exists at destination
+              errors: []
+
+      500:
+        $ref: "#/components/responses/InternalServerError"
+
+/orgs/{orgId}/folders/{folderId}/restore:
+  patch:
+    summary: Restore Folder
+    description: |
+      Restores a soft deleted folder.
+
+      **Authentication:** Required
+
+      **Permissions:** `folder.restore` on folder
+    tags:
+      - Folders
+    security:
+      - BearerAuth: []
+    parameters:
+      - in: path
+        name: orgId
+        required: true
+        schema:
+          type: integer
+        description: Organization ID
+        example: 1
+      - in: path
+        name: folderId
+        required: true
+        schema:
+          type: integer
+        description: Folder ID
+        example: 1
+    responses:
+      200:
+        description: Folder Restored Successfully
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "#/components/schemas/ApiResponse"
+                - type: object
+                  properties:
+                    data:
+                      $ref: "#/components/schemas/Folder"
+            example:
+              statusCode: 200
+              success: true
+              message: Folder moved
+              data:
+                id: 1
+                orgId: 1
+                createdBy: 1
+                name: Acme Corp
+                parentFolderId: 1
+                createdAt: "2022-01-01T00:00:00.000Z"
+                deletedAt: null
+                isRoot: false
+
+      400:
+        description: Bad Request
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApiError"
+            example:
+              statusCode: 400
+              success: false
+              message: Folder already exists
+              errors: []
+
+      401:
+        $ref: "#/components/responses/UnauthorizedError"
+
+      403:
+        $ref: "#/components/responses/ForbiddenError"
+
+      404:
+        description: Not Found
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApiError"
+            example:
+              statusCode: 404
+              success: false
+              message: Folder not found
+              errors: []
+
+      409:
+        description: Conflict
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApiError"
+            example:
+              statusCode: 409
+              success: false
+              message: Folder with same name already exists at destination
+              errors: []
+
+      500:
+        $ref: "#/components/responses/InternalServerError"
