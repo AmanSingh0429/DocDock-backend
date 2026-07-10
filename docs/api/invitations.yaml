@@ -1,0 +1,539 @@
+/orgs/{orgId}/invitations/:
+  get:
+    summary: Get organization invitations
+    description: |
+      Retrieves a list of invitations for an organization.
+
+      **Authentication:** Required
+
+      **Permissions:** `org.read` on organization
+
+    tags:
+      - Organization Invitations
+    security:
+      - BearerAuth: []
+    parameters:
+      - in: path
+        name: orgId
+        required: true
+        schema:
+          type: integer
+        description: Organization ID
+        example: 1
+    responses:
+      200:
+        description: Fetched Organization Invitations
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "#/components/schemas/ApiResponse"
+                - type: object
+                  properties:
+                    data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        email:
+                          type: string
+                        role:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                            name:
+                              type: string
+                        invitedBy:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                            name:
+                              type: string
+                            email:
+                              type: string
+                        createdAt:
+                          type: string
+                        expiresAt:
+                          type: string
+            example:
+              statusCode: 200
+              success: true
+              message: Invitations fetched successfully
+              data:
+                - id: 1
+                  email: "john.doe@example.com"
+                  role:
+                    id: 2
+                    name: "EDITOR"
+                  invitedBy:
+                    id: 5
+                    name: "Jane Smith"
+                    email: "jane.smith@example.com"
+                  createdAt: "2026-07-10T09:30:00.000Z"
+                  expiresAt: "2026-07-17T09:30:00.000Z"
+                - id: 2
+                  email: "alice@example.com"
+                  role:
+                    id: 3
+                    name: "VIEWER"
+                  invitedBy:
+                    id: 5
+                    name: "Jane Smith"
+                    email: "jane.smith@example.com"
+                  createdAt: "2026-07-09T14:15:00.000Z"
+                  expiresAt: "2026-07-16T14:15:00.000Z"
+
+      401:
+        $ref: "#/components/responses/Unauthorized"
+
+      403:
+        $ref: "#/components/responses/Forbidden"
+
+      500:
+        $ref: "#/components/responses/InternalServerError"
+
+  post:
+    summary: Create organization invitation
+    description: |
+      Creates an invitation for a user to join an organization.
+
+      **Authentication:** Required
+
+      **Permissions:** `org.user.add`
+
+    tags:
+      - Organization Invitations
+    security:
+      - BearerAuth: []
+    parameters:
+      - in: path
+        name: orgId
+        required: true
+        schema:
+          type: integer
+        description: Organization ID
+        example: 1
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - email
+              - role
+            properties:
+              email:
+                type: string
+                example: "john.doe@example.com"
+              role:
+                type: string
+                example: "EDITOR"
+    responses:
+      200:
+        description: Created Organization Invitation
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "#/components/schemas/ApiResponse"
+                - type: object
+                  properties:
+                    data:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        orgId:
+                          type: integer
+                        email:
+                          type: string
+                        roleId:
+                          type: integer
+                        token:
+                          type: string
+                        expiresAt:
+                          type: string
+                        invitedBy:
+                          type: integer
+                        createdAt:
+                          type: string
+            example:
+              statusCode: 200
+              success: true
+              message: Invite Sent
+              data:
+                id: 1
+                orgId: 1
+                email: "john.doe@example.com"
+                roleId: 2
+                token: "tokenxghdhkjkkjvjhgqwpqh"
+                expiresAt: "2026-07-17T09:30:00.000Z"
+                invitedBy: 5
+                createdAt: "2026-07-10T09:30:00.000Z"
+
+      400:
+        description: Bad Request
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApiError"
+            examples:
+              EMAIL_ROLE_REQUIRED:
+                summary: Missing email and role
+                value:
+                  statusCode: 400
+                  success: false
+                  message: Email and role are required
+                  errors: []
+
+              ALREADY_MEMBER:
+                summary: User already a member
+                value:
+                  statusCode: 400
+                  success: false
+                  message: User already a member of this org
+                  errors: []
+
+      401:
+        $ref: "#/components/responses/Unauthorized"
+
+      403:
+        description: Insufficient permissions
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApiError"
+            examples:
+              INVITER_NOT_MEMBER:
+                summary: Inviter is not a member
+                value:
+                  statusCode: 403
+                  success: false
+                  message: You are not a member of this organization
+                  errors: []
+
+              INSUFFICIENT_PERMISSIONS:
+                summary: Insufficient permissions
+                value:
+                  statusCode: 403
+                  success: false
+                  message: Insufficient permissions
+                  errors: []
+
+      500:
+        $ref: "#/components/responses/InternalServerError"
+
+/orgs/{orgId}/invitations/token:
+  get:
+    summary: Get invitation by token
+    description: |
+      Retrieves an invitation by token.
+
+      **Authentication:** Required
+
+      **Permissions:** `org.read` on organization
+
+    tags:
+      - Organization Invitations
+    security:
+      - BearerAuth: []
+    parameters:
+      - in: path
+        name: orgId
+        required: true
+        schema:
+          type: integer
+        description: Organization ID
+        example: 1
+      - in: path
+        name: token
+        required: true
+        schema:
+          type: string
+        description: Invitation Token
+        example: "tokenxghdhkjkkjvjhgqwpqh"
+    responses:
+      200:
+        description: Fetched Invitation
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "#/components/schemas/ApiResponse"
+                - type: object
+                  properties:
+                    data:
+                      type: object
+                      properties:
+                        org:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                            name:
+                              type: string
+                        role:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                            name:
+                              type: string
+                        invitedBy:
+                          type: object
+                          properties:
+                            name:
+                              type: string
+                            email:
+                              type: string
+                        email:
+                          type: string
+                        expiresAt:
+                          type: string
+                  example:
+                    success: true
+                    message: "Fetched Invitation"
+                    data:
+                      org:
+                        id: 1
+                        name: "Acme Inc."
+                      role:
+                        id: 2
+                        name: "Editor"
+                      invitedBy:
+                        name: "Jane Smith"
+                        email: "jane.smith@example.com"
+                      email: "john.doe@example.com"
+                      expiresAt: "2026-07-17T09:30:00.000Z"
+      400:
+        description: Bad Request
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApiError"
+            example:
+              statusCode: 400
+              success: false
+              message: "Invitation expired"
+              errors: []
+
+      401:
+        $ref: "#/components/responses/Unauthorized"
+
+      403:
+        $ref: "#/components/responses/Forbidden"
+
+      404:
+        description: Not Found
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApiError"
+            example:
+              statusCode: 404
+              success: false
+              message: "Invalid invitation"
+              errors: []
+
+      500:
+        $ref: "#/components/responses/InternalServerError"
+
+/orgs/{orgId}/invitations/accept:
+  post:
+    summary: Accept invitation
+    description: |
+      Accepts an invitation.
+
+      **Authentication:** Required
+
+      **Permissions:** NONE
+    tags:
+      - Organization Invitations
+    security:
+      - BearerAuth: []
+    parameters:
+      - in: path
+        name: orgId
+        required: true
+        schema:
+          type: integer
+        description: Organization ID
+        example: 1
+      - in: query
+        name: token
+        required: true
+        schema:
+          type: string
+        description: Invitation Token
+        example: "tokenxghdhkjkkjvjhgqwpqh"
+    responses:
+      200:
+        description: Accepted Invitation Successfully
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "#/components/schemas/ApiResponse"
+                - type: object
+                  properties:
+                    data:
+                      type: object
+                      properties:
+                        orgId:
+                          type: integer
+                        roleId:
+                          type: integer
+                  example:
+                    success: true
+                    message: "Invite Accepted"
+                    data:
+                      orgId: 1
+                      roleId: 2
+      400:
+        description: Bad Request
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApiError"
+            examples:
+              INVALID_TOKEN:
+                summary: Invalid Token
+                value:
+                  statusCode: 400
+                  success: false
+                  message: Invalid invitation token
+                  errors: []
+
+              EXPIRED_TOKEN:
+                summary: Expired Token
+                value:
+                  statusCode: 400
+                  success: false
+                  message: Invitation has expired
+                  errors: []
+
+              USER_ALREADY_MEMBER:
+                summary: User already a member
+                value:
+                  statusCode: 400
+                  success: false
+                  message: User already a member of this organization
+                  errors: []
+
+      401:
+        $ref: "#/components/responses/Unauthorized"
+
+      403:
+        description: Forbidden
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApiError"
+            examples:
+              WRONG_INVITATION:
+                summary: Wrong invitation
+                value:
+                  statusCode: 403
+                  success: false
+                  message: This invitation is not for your account
+                  errors: []
+
+              INSUFFICIENT_PERMISSIONS:
+                summary: Insufficient permissions
+                value:
+                  statusCode: 403
+                  success: false
+                  message: Insufficient permissions
+                  errors: []
+
+      404:
+        description: Not Found
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApiError"
+            example:
+              statusCode: 404
+              success: false
+              message: Invitation not found
+              errors: []
+
+      500:
+        $ref: "#/components/responses/InternalServerError"
+
+/orgs/{orgId}/invitations/revoke:
+  delete:
+    summary: Revoke invitation
+    description: |
+      Revokes an invitation.
+
+      **Authentication:** Required
+
+      **Permissions:** `org.user.remove`
+
+    tags:
+      - Organization Invitations
+    security:
+      - BearerAuth: []
+    parameters:
+      - in: path
+        name: orgId
+        required: true
+        schema:
+          type: integer
+        description: Organization ID
+        example: 1
+      - in: query
+        name: token
+        required: true
+        schema:
+          type: string
+        description: Invitation Token
+        example: "tokenxghdhkjkkjvjhgqwpqh"
+
+    responses:
+      200:
+        description: Accepted Invitation Successfully
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "#/components/schemas/ApiResponse"
+                - type: object
+                  properties:
+                    data:
+                      type: object
+                      properties:
+                        message:
+                          type: string
+                  example:
+                    success: true
+                    message: "Invite Accepted"
+                    data:
+                      message: "Invite revoked successfully"
+
+      401:
+        $ref: "#/components/responses/Unauthorized"
+
+      403:
+        $ref: "#/components/responses/ForbiddenError"
+
+      404:
+        description: Not Found
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApiError"
+            example:
+              statusCode: 404
+              success: false
+              message: Invitation already accepted or revoked
+              errors: []
+
+      500:
+        $ref: "#/components/responses/InternalServerError"
