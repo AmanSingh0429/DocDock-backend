@@ -1,0 +1,150 @@
+/register:
+  post:
+    summary: Register a new user
+    tags: [Auth]
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - name
+              - email
+              - password
+            properties:
+              name:
+                type: string
+                example: John Doe
+              email:
+                type: string
+                example: jhon@example.com
+              password:
+                type: string
+                example: password
+
+    responses:
+      200:
+        description: User registered successfully
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "#/components/schemas/ApiResponse"
+                - type: object
+                  properties:
+                    data:
+                      $ref: "#/components/schemas/User"
+            example:
+              statusCode: 200
+              success: true
+              message: User registered successfully
+              data:
+                id: 1
+                name: John Doe
+                email: jhon@example.com
+                passwordHash: $2b$10$R9lV2VXxN4bG5v1Z8eT2N6B6B6B6B6B6B6B6B6B6B6B6B6B6
+                image: https://example.com/image.jpg
+                createdAt: "2022-01-01T00:00:00.000Z"
+
+      400:
+        description: Bad Request
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApiError"
+            example:
+              statusCode: 400
+              success: false
+              message: Name, email and password are required
+              errors: []
+
+      409:
+        description: Conflict
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApiError"
+            example:
+              statusCode: 409
+              success: false
+              message: Email already exists
+              errors: []
+
+      500:
+        $ref: "#/components/responses/InternalServerError"
+
+/login:
+  post:
+    summary: Login a user
+    tags: [Auth]
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - email
+              - password
+            properties:
+              email:
+                type: string
+                example: jhon@example.com
+              password:
+                type: string
+                example: password
+
+    responses:
+      200:
+        description: User registered successfully
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "#/components/schemas/ApiResponse"
+                - type: object
+                  properties:
+                    data:
+                      type: object
+                      properties:
+                        user:
+                          $ref: "#/components/schemas/User"
+                        token:
+                          type: string
+            example:
+              statusCode: 200
+              success: true
+              message: User logged in successfully
+              data:
+                user:
+                  id: 1
+                  name: John Doe
+                  email: jhon@example.com
+                token: eyJh....
+
+      401:
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApiError"
+            examples:
+              INVALID_EMAIL:
+                summary: Invalid email
+                value:
+                  statusCode: 401
+                  success: false
+                  message: Invalid email
+                  errors: []
+
+              INVALID_PASSWORD:
+                summary: Invalid password
+                value:
+                  statusCode: 401
+                  success: false
+                  message: Invalid password
+                  errors: []
+
+      500:
+        $ref: "#/components/responses/InternalServerError"
