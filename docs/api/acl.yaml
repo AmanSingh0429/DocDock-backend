@@ -1,0 +1,694 @@
+# FOLDER ACL
+/orgs/{orgId}/folders/{folderId}/permissions:
+  post:
+    summary: Add Folder Permission
+    description: |
+      Adds a new ACL permission for a user on a folder.
+
+      **Authentication:** Required
+
+      **Permissions:** `org.acl.manage`
+    tags:
+      - Folder ACL
+    security:
+      - BearerAuth: []
+    parameters:
+      - in: path
+        name: orgId
+        required: true
+        schema:
+          type: integer
+        description: Organization ID
+        example: 1
+      - in: path
+        name: folderId
+        required: true
+        schema:
+          type: integer
+        description: Folder ID
+        example: 1
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - targetUserId
+              - permissionName
+              - effect
+            properties:
+              targetUserId:
+                type: integer
+                example: 1
+              permissionName:
+                type: string
+                example: "folder.read"
+              effect:
+                type: string
+                example: "ALLOW"
+    responses:
+      200:
+        description: Permission modified successfully
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "#/components/schemas/ApiResponse"
+                - type: object
+                  properties:
+                    data:
+                      type: object
+                      properties:
+                        folderId:
+                          type: integer
+                        userId:
+                          type: integer
+                        permissionId:
+                          type: integer
+                        effect:
+                          type: string
+            example:
+              statusCode: 200
+              success: true
+              message: Permission modified successfully
+              data:
+                folderId: 1
+                userId: 1
+                permissionId: 1
+                effect: "ALLOW"
+
+      400:
+        description: Bad Request
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApiError"
+            examples:
+              MISSING_RESOURCES:
+                summary: Missing Resources
+                value:
+                  statusCode: 400
+                  success: false
+                  message: Missing required resources to perform the action
+                  errors: []
+
+              INVALID_EFFECT:
+                summary: Invalid Effect
+                value:
+                  statusCode: 400
+                  success: false
+                  message: Invalid permission effect
+                  errors: []
+
+              INVALID_PERMISSION_NAME:
+                summary: Invalid Permission Name
+                value:
+                  statusCode: 400
+                  success: false
+                  message: Invalid permission for folder
+                  errors: []
+
+      401:
+        $ref: "#/components/responses/UnauthorizedError"
+
+      403:
+        description: Forbidden
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApiError"
+            examples:
+              MODIFYING_OWNER_PERMISSION:
+                summary: Modifying Owner Permission
+                value:
+                  statusCode: 403
+                  success: false
+                  message: Owner permissions cannot be modified
+                  errors: []
+
+              MODIFIER_NOT_MEMBER:
+                summary: Modifier User Not Member
+                value:
+                  statusCode: 403
+                  success: false
+                  message: Modifier not a part of this org
+                  errors: []
+
+              INSUFFICIENT_PERMISSIONS:
+                summary: Insufficient Permissions
+                value:
+                  statusCode: 403
+                  success: false
+                  message: You do not have permission to perform this action
+                  errors: []
+
+      404:
+        description: Not Found
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApiError"
+            examples:
+              TARGET_NOT_MEMBER:
+                summary: Target User Not Member
+                value:
+                  statusCode: 404
+                  success: false
+                  message: Target not a part of this org
+                  errors: []
+
+              TARGET_FOLDER_NOT_FOUND:
+                summary: Target Folder Not Found
+                value:
+                  statusCode: 404
+                  success: false
+                  message: Target folder not found
+                  errors: []
+
+              PERMISSION_NOT_FOUND:
+                summary: Permission Not Found
+                value:
+                  statusCode: 404
+                  success: false
+                  message: Permission not found
+                  errors: []
+
+      500:
+        $ref: "#/components/responses/InternalServerError"
+
+  delete:
+    summary: Remove Folder Permission
+    description: |
+      Removes the specific ACL permission added for a user on a folder.
+
+      **Authentication:** Required
+
+      **Permissions:** `org.acl.manage`
+    tags:
+      - Folder ACL
+    security:
+      - BearerAuth: []
+    parameters:
+      - in: path
+        name: orgId
+        required: true
+        schema:
+          type: integer
+        description: Organization ID
+        example: 1
+      - in: path
+        name: folderId
+        required: true
+        schema:
+          type: integer
+        description: Folder ID
+        example: 1
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - targetUserId
+              - permissionName
+            properties:
+              targetUserId:
+                type: integer
+                example: 1
+              permissionName:
+                type: string
+                example: "folder.read"
+    responses:
+      200:
+        description: Permission deleted successfully
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "#/components/schemas/ApiResponse"
+                - type: object
+                  properties:
+                    data:
+                      type: object
+                      properties:
+                        folderId:
+                          type: integer
+                        userId:
+                          type: integer
+                        permissionId:
+                          type: integer
+                        effect:
+                          type: string
+            example:
+              statusCode: 200
+              success: true
+              message: Permission deleted successfully
+              data:
+                folderId: 1
+                userId: 1
+                permissionId: 1
+                effect: "ALLOW"
+      400:
+        description: Bad Request
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApiError"
+            examples:
+              MISSING_RESOURCES:
+                summary: Missing Resources
+                value:
+                  statusCode: 400
+                  success: false
+                  message: Missing required resources to perform the action
+                  errors: []
+
+              INVALID_PERMISSION_NAME:
+                summary: Invalid Permission Name
+                value:
+                  statusCode: 400
+                  success: false
+                  message: Invalid permission for folder
+                  errors: []
+
+      401:
+        $ref: "#/components/responses/UnauthorizedError"
+
+      403:
+        description: Forbidden
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApiError"
+            examples:
+              MODIFYING_OWNER_PERMISSION:
+                summary: Modifying Owner Permission
+                value:
+                  statusCode: 403
+                  success: false
+                  message: Owner permissions cannot be modified
+                  errors: []
+
+              MODIFIER_NOT_MEMBER:
+                summary: Modifier User Not Member
+                value:
+                  statusCode: 403
+                  success: false
+                  message: Modifier not a part of this org
+                  errors: []
+
+              INSUFFICIENT_PERMISSIONS:
+                summary: Insufficient Permissions
+                value:
+                  statusCode: 403
+                  success: false
+                  message: You do not have permission to perform this action
+                  errors: []
+
+      404:
+        description: Not Found
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApiError"
+            examples:
+              TARGET_NOT_MEMBER:
+                summary: Target User Not Member
+                value:
+                  statusCode: 404
+                  success: false
+                  message: Target not a part of this org
+                  errors: []
+
+              TARGET_FOLDER_NOT_FOUND:
+                summary: Target Folder Not Found
+                value:
+                  statusCode: 404
+                  success: false
+                  message: Target folder not found
+                  errors: []
+
+              PERMISSION_NOT_FOUND:
+                summary: Permission Not Found
+                value:
+                  statusCode: 404
+                  success: false
+                  message: Permission not found
+                  errors: []
+
+      500:
+        $ref: "#/components/responses/InternalServerError"
+
+# DOCUMENT ACL
+/orgs/{orgId}/folders/{docId}/permissions:
+  post:
+    summary: Add Document Permission
+    description: |
+      Adds a new ACL permission for a user on a document.
+
+      **Authentication:** Required
+
+      **Permissions:** `org.acl.manage`
+    tags:
+      - Document ACL
+    security:
+      - BearerAuth: []
+    parameters:
+      - in: path
+        name: orgId
+        required: true
+        schema:
+          type: integer
+        description: Organization ID
+        example: 1
+      - in: path
+        name: docId
+        required: true
+        schema:
+          type: integer
+        description: Document ID
+        example: 1
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - targetUserId
+              - permissionName
+              - effect
+            properties:
+              targetUserId:
+                type: integer
+                example: 1
+              permissionName:
+                type: string
+                example: "folder.read"
+              effect:
+                type: string
+                example: "ALLOW"
+    responses:
+      200:
+        description: Permission modified successfully
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "#/components/schemas/ApiResponse"
+                - type: object
+                  properties:
+                    data:
+                      type: object
+                      properties:
+                        docId:
+                          type: integer
+                        userId:
+                          type: integer
+                        permissionId:
+                          type: integer
+                        effect:
+                          type: string
+            example:
+              statusCode: 200
+              success: true
+              message: Permission modified successfully
+              data:
+                docId: 1
+                userId: 1
+                permissionId: 1
+                effect: "ALLOW"
+
+      400:
+        description: Bad Request
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApiError"
+            examples:
+              MISSING_RESOURCES:
+                summary: Missing Resources
+                value:
+                  statusCode: 400
+                  success: false
+                  message: Missing required resources to perform the action
+                  errors: []
+
+              INVALID_EFFECT:
+                summary: Invalid Effect
+                value:
+                  statusCode: 400
+                  success: false
+                  message: Invalid permission effect
+                  errors: []
+
+              INVALID_PERMISSION_NAME:
+                summary: Invalid Permission Name
+                value:
+                  statusCode: 400
+                  success: false
+                  message: Invalid permission for document
+                  errors: []
+
+      401:
+        $ref: "#/components/responses/UnauthorizedError"
+
+      403:
+        description: Forbidden
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApiError"
+            examples:
+              MODIFYING_OWNER_PERMISSION:
+                summary: Modifying Owner Permission
+                value:
+                  statusCode: 403
+                  success: false
+                  message: Owner permissions cannot be modified
+                  errors: []
+
+              MODIFIER_NOT_MEMBER:
+                summary: Modifier User Not Member
+                value:
+                  statusCode: 403
+                  success: false
+                  message: Modifier not a part of this org
+                  errors: []
+
+              INSUFFICIENT_PERMISSIONS:
+                summary: Insufficient Permissions
+                value:
+                  statusCode: 403
+                  success: false
+                  message: You do not have permission to perform this action
+                  errors: []
+
+      404:
+        description: Not Found
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApiError"
+            examples:
+              TARGET_NOT_MEMBER:
+                summary: Target User Not Member
+                value:
+                  statusCode: 404
+                  success: false
+                  message: Target not a part of this org
+                  errors: []
+
+              TARGET_DOC_NOT_FOUND:
+                summary: Target Document Not Found
+                value:
+                  statusCode: 404
+                  success: false
+                  message: Target document not found
+                  errors: []
+
+              PERMISSION_NOT_FOUND:
+                summary: Permission Not Found
+                value:
+                  statusCode: 404
+                  success: false
+                  message: Permission not found
+                  errors: []
+
+      500:
+        $ref: "#/components/responses/InternalServerError"
+
+  delete:
+    summary: Remove Document Permission
+    description: |
+      Removes an ACL permission for a user on a document.
+
+      **Authentication:** Required
+
+      **Permissions:** `org.acl.manage`
+    tags:
+      - Document ACL
+    security:
+      - BearerAuth: []
+    parameters:
+      - in: path
+        name: orgId
+        required: true
+        schema:
+          type: integer
+        description: Organization ID
+        example: 1
+      - in: path
+        name: docId
+        required: true
+        schema:
+          type: integer
+        description: Document ID
+        example: 1
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - targetUserId
+              - permissionName
+            properties:
+              targetUserId:
+                type: integer
+                example: 1
+              permissionName:
+                type: string
+                example: "folder.read"
+    responses:
+      200:
+        description: Permission deleted successfully
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "#/components/schemas/ApiResponse"
+                - type: object
+                  properties:
+                    data:
+                      type: object
+                      properties:
+                        docId:
+                          type: integer
+                        userId:
+                          type: integer
+                        permissionId:
+                          type: integer
+                        effect:
+                          type: string
+            example:
+              statusCode: 200
+              success: true
+              message: Permission modified successfully
+              data:
+                docId: 1
+                userId: 1
+                permissionId: 1
+                effect: "ALLOW"
+
+      400:
+        description: Bad Request
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApiError"
+            examples:
+              MISSING_RESOURCES:
+                summary: Missing Resources
+                value:
+                  statusCode: 400
+                  success: false
+                  message: Missing required resources to perform the action
+                  errors: []
+
+              INVALID_EFFECT:
+                summary: Invalid Effect
+                value:
+                  statusCode: 400
+                  success: false
+                  message: Invalid permission effect
+                  errors: []
+
+              INVALID_PERMISSION_NAME:
+                summary: Invalid Permission Name
+                value:
+                  statusCode: 400
+                  success: false
+                  message: Invalid permission for document
+                  errors: []
+
+      401:
+        $ref: "#/components/responses/UnauthorizedError"
+
+      403:
+        description: Forbidden
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApiError"
+            examples:
+              MODIFYING_OWNER_PERMISSION:
+                summary: Modifying Owner Permission
+                value:
+                  statusCode: 403
+                  success: false
+                  message: Owner permissions cannot be modified
+                  errors: []
+
+              MODIFIER_NOT_MEMBER:
+                summary: Modifier User Not Member
+                value:
+                  statusCode: 403
+                  success: false
+                  message: Modifier not a part of this org
+                  errors: []
+
+              INSUFFICIENT_PERMISSIONS:
+                summary: Insufficient Permissions
+                value:
+                  statusCode: 403
+                  success: false
+                  message: You do not have permission to perform this action
+                  errors: []
+
+      404:
+        description: Not Found
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApiError"
+            examples:
+              TARGET_NOT_MEMBER:
+                summary: Target User Not Member
+                value:
+                  statusCode: 404
+                  success: false
+                  message: Target not a part of this org
+                  errors: []
+
+              TARGET_DOC_NOT_FOUND:
+                summary: Target Document Not Found
+                value:
+                  statusCode: 404
+                  success: false
+                  message: Target document not found
+                  errors: []
+
+              PERMISSION_NOT_FOUND:
+                summary: Permission Not Found
+                value:
+                  statusCode: 404
+                  success: false
+                  message: Permission not found
+                  errors: []
+
+      500:
+        $ref: "#/components/responses/InternalServerError"
