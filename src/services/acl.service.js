@@ -4,7 +4,7 @@ import { ApiError } from "../utils/ApiError.js";
 export const setDocPermissionService = async (orgId, targetUserId, docId, modifierUserId, permissionName, effect) => {
   try {
     if (!docId || !permissionName || !targetUserId || !modifierUserId) {
-      throw new ApiError(400, "Document and Permission ID required");
+      throw new ApiError(400, "Missing required resources to perform the action");
     }
     if (!permissionName.startsWith("document.")) {
       throw new ApiError(400, "Invalid permission for document");
@@ -146,7 +146,7 @@ export const deleteDocPermissionService = async (orgId, targetUserId, docId, mod
     })
 
     if (!modifierMembership) {
-      throw new ApiError(404, "Modifier not a part of this org")
+      throw new ApiError(403, "Modifier not a part of this org")
     }
     const targetDoc = await prisma.doc.findFirst({
       where: {
@@ -272,7 +272,7 @@ export const setFolderPermissionService = async (orgId, targetUserId, folderId, 
       }
     })
     if (!modifierMembership) {
-      throw new ApiError(404, "Modifier not a part of this org")
+      throw new ApiError(403, "Modifier not a part of this org")
     }
 
     const folder = await prisma.folder.findFirst({
@@ -382,7 +382,7 @@ export const deleteFolderPermissionService = async (orgId, targetUserId, folderI
       }
     })
     if (!modifierMembership) {
-      throw new ApiError(404, "Modifier not a part of this org")
+      throw new ApiError(403, "Modifier not a part of this org")
     }
     const folder = await prisma.folder.findFirst({
       where: {
