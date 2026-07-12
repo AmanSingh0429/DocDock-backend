@@ -3,7 +3,7 @@
 [![Run in Postman](https://run.pstmn.io/button.svg)](https://schema.getpostman.com/json/collection/v2.1.0/collection.json)
 [![View API Docs](https://img.shields.io/badge/View-API%20Docs-0072F5?style=for-the-badge&logo=swagger&logoColor=white)](docs/api.md)
 [![View ERD](https://img.shields.io/badge/View-Database%20ERD-4CAF50?style=for-the-badge&logo=databricks&logoColor=white)](docs/DB-ERD.svg)
-
+[![Setup Guide](https://img.shields.io/badge/Setup-Guide-FF9800?style=for-the-badge&logo=readthedocs&logoColor=white)](SETUP.md)
 ---
 
 ## Architecture Overview
