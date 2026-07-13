@@ -11,6 +11,11 @@ const options = {
     servers: [
       {
         url: "http://localhost:5000/api/v1",
+        description: "Local Server",
+      },
+      {
+        url: "https://docdock-backend-production.up.railway.app/api/v1",
+        description: "Production Server",
       },
     ],
 
