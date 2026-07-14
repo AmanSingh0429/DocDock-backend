@@ -17,7 +17,7 @@ export const createOrgInvitationService = async (orgId, email, role, userId) => 
       }
     });
     if (!verifyInviter) {
-      throw new ApiError(403, "You are not the member of this orginazation")
+      throw new ApiError(403, "You are not a member of this organization")
     }
     const invitedUser = await prisma.user.findUnique({
       where: {

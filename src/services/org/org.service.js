@@ -61,7 +61,6 @@ export const createOrgService = async (orgName, createdByID) => {
     })
     return results
   } catch (error) {
-    console.log(error)
     if (error instanceof ApiError) {
       throw error;
     }
@@ -169,7 +168,7 @@ export const leaveOrgService = async (orgId, userId) => {
       }
     })
     if (!membership) {
-      throw new ApiError(404, "User is not the member of this org")
+      throw new ApiError(404, "User is not a member of this org")
     }
 
     const transactionResult = await prisma.$transaction(async (tx) => {
@@ -334,7 +333,6 @@ export const assignUserRoleService = async (orgId, modifierUserId, targetUserId,
 };
 
 export const removeUserService = async (orgId, modifierUserId, targetUserId) => {
-  console.log("reach")
   if (!targetUserId) {
     throw new ApiError(400, "Target user ID is required")
   }
@@ -424,7 +422,6 @@ export const removeUserService = async (orgId, modifierUserId, targetUserId) => 
     })
     return transactionResult
   } catch (error) {
-    console.log(error)
     if (error instanceof ApiError) {
       throw error
     }
